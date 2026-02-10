@@ -22,6 +22,9 @@ import edu.wpi.first.units.measure.Velocity;
  */
 public final class Constants {
   public static final LinearVelocity DRIVE_MAX_SPEED = FeetPerSecond.of(12);
+  public static final int ClimbMotorCanID = 22; //please set the canID to something real thanks
+  public static final double climbSpeed = 2; //the climb speed for the motor
+
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;

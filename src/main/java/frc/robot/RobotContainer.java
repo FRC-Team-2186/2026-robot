@@ -6,6 +6,7 @@ package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
 
@@ -30,11 +31,16 @@ public class RobotContainer {
       OperatorConstants.kDriverControllerPort);
 
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
-
+  private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
+ 
   public RobotContainer() {
     // Configure the trigger bindings
+    //changed button A & B to move up and down when climbing
+    mDriverController.buttonA().whileTrue(new MoveDown(mClimbSubsystem, this::getClimbSpeed));
+    mDriverController.buttonB().whileTrue(new MoveUp(mClimbSubsystem, this::getClimbSpeed));
     configureBindings();
+
   }
 
   /**

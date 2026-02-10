@@ -10,12 +10,21 @@ import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
+import com.revrobotics.PersistMode;
+import com.revrobotics.ResetMode;
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.Constants.OperatorConstants;
 import frc.robot.utils.CommandsLogging;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 
 /**
  * The methods in this class are called automatically corresponding to each mode, as described in the TimedRobot
@@ -27,6 +36,7 @@ public class Robot extends LoggedRobot {
   private SimulatedArena mSimArena;
 
   private final RobotContainer m_robotContainer;
+  private final CommandXboxController mDriverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
@@ -115,6 +125,8 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+    //setting motor speed for the moving up and down of the climb commands
+    setMotorSpeed(mDriverController.setMotorSpeed(2));
   }
 
   @Override
@@ -132,6 +144,12 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationInit() {
     mSimArena = SimulatedArena.getInstance();
+   
+   //init the sparkmax to fix behavior
+    SparkMax motor = new SparkMax(10, MotorType.kBrushless);
+    SparkMaxConfig config = new SparkMaxConfig();
+    //Reset and apply empty default config
+    motor.config(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersist);
   }
 
   /** This function is called periodically whilst in simulation. */
