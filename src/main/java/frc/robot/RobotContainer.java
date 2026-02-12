@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import frc.robot.subsystems.ShooterSubsystems;
+import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,15 +20,18 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController mDriverController = new CommandXboxController(
+  private CommandXboxController mDriverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
-
+  private  CommandXboxController mOperatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    System.out.println("Working");
     // Configure the trigger bindings
     configureBindings();
+    
   }
 
   /**
@@ -37,6 +42,12 @@ public class RobotContainer {
    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
+    
+    ShooterSubsystems shooter = new ShooterSubsystems();
+    mOperatorController.a().onTrue(shooter.runMotor(6.5));
+    mOperatorController.y().onTrue(shooter.runMotor(5.5));
+    mOperatorController.x().onTrue(shooter.runMotor(7.5));
+    mOperatorController.b().onTrue(shooter.runMotor(0));
   }
 
   /**
