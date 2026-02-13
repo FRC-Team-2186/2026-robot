@@ -8,6 +8,9 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
+import frc.robot.commands.IntakeFuel;
+import frc.robot.commands.IntakePivot;
+import frc.robot.subsystems.IntakeSubsystem;
 
 import java.io.File;
 
@@ -31,8 +34,30 @@ public class RobotContainer {
 
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
+    private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
+
+
+
+
+  public double getIntakeSpeed(){
+   
+    return Constants.IntakeSpeed;
+  }
+
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+  //Controlling the Intake/Outake
+    mDriverController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeed));
+    mDriverController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeed));
+
+
+    //Controlling the Pivot Point for Intake
+    mDriverController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeed));
+    mDriverController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeed));
+
+
     // Configure the trigger bindings
     configureBindings();
   }

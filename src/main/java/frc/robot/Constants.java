@@ -21,9 +21,15 @@ import edu.wpi.first.units.measure.Velocity;
  * reduce verbosity.
  */
 public final class Constants {
+  public static  final int FuelIntakeCanID = 25;
+  public static final int PivotIntakeCanID = 1;
+   
+  public static final double IntakeSpeed = 0.5;
   public static final LinearVelocity DRIVE_MAX_SPEED = FeetPerSecond.of(12);
+  
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
+  
   }
 }
