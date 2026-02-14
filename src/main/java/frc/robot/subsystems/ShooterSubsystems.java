@@ -23,9 +23,25 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class ShooterSubsystems extends SubsystemBase {
 
-  private final SparkMax m_motor = new SparkMax(25, MotorType.kBrushless);
-  private final SparkMax m2_motor = new SparkMax(22, MotorType.kBrushless);
- 
+  /*
+  private final SparkMax m_motor = new SparkMax(27, MotorType.kBrushless);
+  private final SparkMax m2_motor = new SparkMax(28, MotorType.kBrushless);
+  private final SparkMax m3_motor = new SparkMax(23, MotorType.kBrushless);
+  */
+
+  private final SparkMax m_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelMotorCanId, MotorType.kBrushless);
+  private final SparkMax m2_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
+  public final SparkMax m3_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFeederMotorCanId, MotorType.kBrushless);
+  
+  public static boolean isFeederWorking = false;
+
+  public static void madeFeederTrue(){
+    isFeederWorking = true;
+  }
+
+  public static void madeFeederFalse(){
+    isFeederWorking = false;
+  }
   
 
   public ShooterSubsystems() {
@@ -33,20 +49,23 @@ public class ShooterSubsystems extends SubsystemBase {
 
     SparkMaxConfig configs = new SparkMaxConfig();
     SparkMaxConfig configs2 = new SparkMaxConfig();
+    SparkMaxConfig configs3 = new SparkMaxConfig();
 
     configs.inverted(true);
     configs2.inverted(false);
+    configs3.inverted(false);
 
 
     m_motor.configure(configs, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m2_motor.configure(configs2, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    m3_motor.configure(configs3, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
   
   }
 
   // Method to run the motor at the desired speed from the button press
   public Command runMotor(double velocity) {
     return run(() -> {
-      //m_motor.setVoltage(velocity);
+      m_motor.setVoltage(velocity);
       m2_motor.setVoltage(velocity);
     });
   }
@@ -57,5 +76,38 @@ public class ShooterSubsystems extends SubsystemBase {
       m2_motor.setVoltage(0);
     });
   }
+
+  /*
+  public Command checkFeeder() {
+    if (isFeederWorking == false){
+      madeFeederTrue();
+      System.out.println("Running");
+      System.out.println(isFeederWorking);
+      return runFeeder();
+    } else {
+      madeFeederFalse();
+      System.out.println("Stopping");
+      System.out.println(isFeederWorking);
+      return stopFeeder();
+    }
+  }
+
+  
+  public Command runFeeder() {
+    return run(() -> {
+      m3_motor.setVoltage(6);
+    });
+  }
+
+  public void end(boolean interrupted){
+    m3_motor.setVoltage(0);
+  }
+
+  public Command stopFeeder() {
+    return run(() -> {
+      m3_motor.setVoltage(0);
+    });
+  }
+  */
 
 }

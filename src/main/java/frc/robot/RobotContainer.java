@@ -8,6 +8,7 @@ import frc.robot.subsystems.ShooterSubsystems;
 import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.ShooterCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -44,14 +45,27 @@ public class RobotContainer {
   private void configureBindings() {
     
     ShooterSubsystems shooter = new ShooterSubsystems();
-    mOperatorController.a().onTrue(shooter.runMotor(6.5));
-    mOperatorController.y().onTrue(shooter.runMotor(5.5));
+
+    /*
+    mOperatorController.a().onTrue(shooter.stopFeeder());
+    mOperatorController.y().onTrue(shooter.runFeeder());
+    */
+
+    //mOperatorController.a().onTrue(shooter.checkFeeder());
+
+    /*
+    mOperatorController.a().whileTrue(shooter.runFeeder());
+    mOperatorController.a().whileFalse(shooter.stopFeeder());
+    */
+
+    mOperatorController.a().whileTrue(new ShooterCommand(shooter));
+      
     mOperatorController.x().onTrue(shooter.runMotor(7.5));
     mOperatorController.b().onTrue(shooter.runMotor(0));
   }
 
   /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
+   * Use this to pass the autonomous command to the main {@lin\k Robot} class.
    *
    * @return the command to run in autonomous
    */
