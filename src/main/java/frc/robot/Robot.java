@@ -28,6 +28,8 @@ public class Robot extends LoggedRobot {
 
   private final RobotContainer m_robotContainer;
 
+  private VisionSubsystem m_visionSubsystem;
+
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
    */
@@ -46,6 +48,8 @@ public class Robot extends LoggedRobot {
     // Instantiate our RobotContainer. This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+
+    // TODO: uncomment -> m_visionSubsystem = new VisionSubsystem(drivetrain::addVisionMeasurement);
   }
 
   /**
@@ -74,6 +78,9 @@ public class Robot extends LoggedRobot {
     Logger.recordOutput("FieldSimulation/RobotPose", m_robotContainer.getSwerveSubsystem().getPose());
     Logger.recordOutput("FieldSimulation/TargetPose",
         m_robotContainer.getSwerveSubsystem().getSwerveDrive().field.getObject("targetPose").getPose());
+    
+    // Update vision
+    vision.periodic();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
