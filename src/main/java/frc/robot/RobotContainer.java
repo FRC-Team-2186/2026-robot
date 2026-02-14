@@ -9,6 +9,12 @@ import frc.robot.Configs.ShooterSubsystem;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ShooterCommand;
+import frc.robot.subsystems.SwerveSubsystem;
+import swervelib.SwerveDrive;
+
+import java.io.File;
+
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -27,6 +33,9 @@ public class RobotContainer {
   private CommandXboxController mDriverController = new CommandXboxController(
       OperatorConstants.kDriverControllerPort);
   private  CommandXboxController mOperatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+
+  private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     System.out.println("Working");
@@ -72,5 +81,9 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return Commands.none();
+  }
+
+  public SwerveSubsystem getSwerveSubsystem() {
+    return mSwerveDrive;
   }
 }

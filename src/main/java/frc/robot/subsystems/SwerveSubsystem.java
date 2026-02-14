@@ -1,0 +1,135 @@
+package frc.robot.subsystems;
+
+import java.io.File;
+
+import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import swervelib.SwerveDrive;
+import swervelib.parser.SwerveParser;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+
+public class SwerveSubsystem extends SubsystemBase {
+  private final SwerveDrive mSwerveDrive;
+
+  public SwerveSubsystem(File pConfigDir) {
+    boolean isBlueAlliance = DriverStation.getAlliance().map(it -> it == DriverStation.Alliance.Blue).orElse(false);
+    Pose2d startingPose = isBlueAlliance
+        ? new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)), Rotation2d.fromDegrees(0))
+        : new Pose2d(new Translation2d(Meter.of(16), Meter.of(4)), Rotation2d.fromDegrees(180));
+
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+
+    try {
+      mSwerveDrive = new SwerveParser(pConfigDir).createSwerveDrive(Constants.DRIVE_MAX_SPEED.in(MetersPerSecond),
+          startingPose);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+
+    // Only enable heading correction while controlling the robot by angle
+    mSwerveDrive.setHeadingCorrection(false);
+
+    // Disable cosine compensation while in the simulator
+    mSwerveDrive.setCosineCompensator(!SwerveDriveTelemetry.isSimulation);
+
+    // Correct for skew that gets worse as angular velocity increases. Start with a coefficient of 0.1.
+    // TODO: Tune me?
+    mSwerveDrive.setAngularVelocityCompensation(true, true, 0.1);
+
+    // Periodically push absolute offsets to the encoders
+    mSwerveDrive.setModuleEncoderAutoSynchronize(true, 3);
+  }
+
+  /**
+   * This will zero (calibrate) the robot to assume the current position is facing forward
+   * <p>
+   * If red alliance rotate the robot 180 after the drviebase zero command
+   */
+  public void zeroGyroWithAlliance() {
+    if (isRedAlliance()) {
+      zeroGyro();
+      // Set the pose 180 degrees
+      resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
+    } else {
+      zeroGyro();
+    }
+  }
+
+  /**
+   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
+   */
+  public void zeroGyro() {
+    mSwerveDrive.zeroGyro();
+  }
+
+  /**
+   * Resets odometry to the given pose. Gyro angle and module positions do not need to be reset when calling this
+   * method. However, if either gyro angle or module position is reset, this must be called in order for odometry to
+   * keep working.
+   *
+   * @param initialHolonomicPose The pose to set the odometry to
+   */
+  public void resetOdometry(Pose2d initialHolonomicPose) {
+    mSwerveDrive.resetOdometry(initialHolonomicPose);
+  }
+
+  /**
+   * Gets the current pose (position and rotation) of the robot, as reported by odometry.
+   *
+   * @return The robot's pose
+   */
+  public Pose2d getPose() {
+    return mSwerveDrive.getPose();
+  }
+
+  /**
+   * Gets the current yaw angle of the robot, as reported by the swerve pose estimator in the underlying drivebase.
+   * Note, this is not the raw gyro reading, this may be corrected from calls to resetOdometry().
+   *
+   * @return The yaw angle
+   */
+  public Rotation2d getHeading() {
+    return getPose().getRotation();
+  }
+
+  /**
+   * Get the swerve drive kinematics object.
+   *
+   * @return {@link SwerveDriveKinematics} of the swerve drive.
+   */
+  public SwerveDriveKinematics getKinematics() {
+    return mSwerveDrive.kinematics;
+  }
+
+  /**
+   * @return The YAGSL Swerve object.
+   */
+  public SwerveDrive getSwerveDrive() {
+    return mSwerveDrive;
+  }
+
+  /**
+   * Checks if the alliance is red, defaults to false if alliance isn't available.
+   *
+   * @return true if the red alliance, false if blue. Defaults to false if none is available.
+   */
+  private boolean isRedAlliance() {
+    var alliance = DriverStation.getAlliance();
+    return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+  }
+}
