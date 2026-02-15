@@ -24,26 +24,40 @@ import edu.wpi.first.units.measure.Velocity;
  * It is advised to statically import this class (or one of its inner classes) wherever the constants are needed, to
  * reduce verbosity.
  */
+@SuppressWarnings("unused")
 public final class Constants {
   public static final LinearVelocity DRIVE_MAX_SPEED = FeetPerSecond.of(12);
 
+  /*
+  public static  final int FuelIntakeCanID = 10;
+  public static final int PivotIntakeCanID = 22;
+` */
+  
+  public static  final int FuelIntakeCanID = 24;
+  public static final int PivotIntakeCanID = 11;
+  
+
+  public static final double IntakeSpeed = 0.5;
+
   public static class OperatorConstants {
-    public static final int kDriverControllerPort = 1;
-    public static final int kOperatorControllerPort = 0;
+    public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1                                                                             ;
   }
 
   public static final class ShooterSubsystemConstants {
     public static final double FeederSpeed = 6;
-    /*
+    
+    
     public static final int kFeederMotorCanId = 28;    // SPARK Flex CAN ID
     public static final int kFlywheelMotorCanId = 27;  // SPARK Flex CAN ID (Right)
     public static final int kFlywheelFollowerMotorCanId = 23;  // SPARK Flex CAN ID (Left)
-    */
+    
 
-    public static final int kFeederMotorCanId = 10;    // SPARK Flex CAN ID
-    public static final int kFlywheelMotorCanId = 22;  // SPARK Flex CAN ID (Right)
+    /*
+    public static final int kFeederMotorCanId = 22;    // SPARK Flex CAN ID
+    public static final int kFlywheelMotorCanId = 10;  // SPARK Flex CAN ID (Right)
     public static final int kFlywheelFollowerMotorCanId = 25;  // SPARK Flex CAN ID (Left)
-
+    */
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0;

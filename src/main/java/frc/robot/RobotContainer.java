@@ -11,8 +11,10 @@ import frc.robot.commands.Autos;
 import frc.robot.commands.ShooterCommand;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
-
+import frc.robot.commands.IntakeFuel;
+import frc.robot.commands.IntakePivot;
 import java.io.File;
+import frc.robot.subsystems.IntakeSubsystem;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -34,7 +36,19 @@ public class RobotContainer {
       OperatorConstants.kDriverControllerPort);
   private  CommandXboxController mOperatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
-  private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+  ShooterSubsystems shooter = new ShooterSubsystems();
+  //private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
+  private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
+
+  public double getIntakeSpeed(){
+   
+    return Constants.IntakeSpeed;
+  }
+
+  public double getIntakeSpeedReverse(){
+   
+    return Constants.IntakeSpeed * -1;
+  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -52,8 +66,6 @@ public class RobotContainer {
    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
-    
-    ShooterSubsystems shooter = new ShooterSubsystems();
 
     /*
     mOperatorController.a().onTrue(shooter.stopFeeder());
@@ -67,10 +79,23 @@ public class RobotContainer {
     mOperatorController.a().whileFalse(shooter.stopFeeder());
     */
 
+    // USE THIS ONE
+    
     mOperatorController.a().whileTrue(new ShooterCommand(shooter));
       
     mOperatorController.x().onTrue(shooter.runMotor(7.5));
+    mOperatorController.y().onTrue(shooter.runMotor(15));
     mOperatorController.b().onTrue(shooter.runMotor(0));
+    
+
+
+    mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeed));
+    mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeedReverse));
+
+
+    //Controlling the Pivot Point for Intake
+    mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeed));
+    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeedReverse));
   }
 
   /**
@@ -83,7 +108,7 @@ public class RobotContainer {
     return Commands.none();
   }
 
-  public SwerveSubsystem getSwerveSubsystem() {
+  /*public SwerveSubsystem getSwerveSubsystem() {
     return mSwerveDrive;
-  }
+  }*/
 }

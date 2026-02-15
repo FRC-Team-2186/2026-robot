@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 //Joystick Button
 
+@SuppressWarnings("unused")
 public class ShooterSubsystems extends SubsystemBase {
 
   /*

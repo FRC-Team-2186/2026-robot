@@ -70,11 +70,11 @@ public class Robot extends LoggedRobot {
     // Update the simulation
     if (Robot.isSimulation() && mSimArena != null) {
     }
-
-    Logger.recordOutput("FieldSimulation/RobotPose", m_robotContainer.getSwerveSubsystem().getPose());
+    
+    /*Logger.recordOutput("FieldSimulation/RobotPose", m_robotContainer.getSwerveSubsystem().getPose());
     Logger.recordOutput("FieldSimulation/TargetPose",
         m_robotContainer.getSwerveSubsystem().getSwerveDrive().field.getObject("targetPose").getPose());
-  }
+  */}
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override

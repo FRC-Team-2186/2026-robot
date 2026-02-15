@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystems;
 import frc.robot.Constants;
 
+@SuppressWarnings("unused")
 public class ShooterCommand extends Command{
   
   ShooterSubsystems shooter;
