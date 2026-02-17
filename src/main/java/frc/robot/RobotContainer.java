@@ -5,12 +5,16 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
+//import frc.robot.commands.Autos;
+import frc.robot.commands.MoveUp;
+import frc.robot.commands.MoveDown;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
-import swervelib.SwerveDrive;
+//import swervelib.SwerveDrive;
 
 import java.io.File;
+
+//import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -27,18 +31,21 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController mDriverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
-
+  private final CommandXboxController mDriverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
  
+ public double getClimbSpeed(){
+    return Constants.climbSpeed;
+ }
+ 
+ 
   public RobotContainer() {
     // Configure the trigger bindings
     //changed button A & B to move up and down when climbing
-    mDriverController.buttonA().whileTrue(new MoveDown(mClimbSubsystem, this::getClimbSpeed));
-    mDriverController.buttonB().whileTrue(new MoveUp(mClimbSubsystem, this::getClimbSpeed));
+    mDriverController.a().onTrue(new MoveUp(mClimbSubsystem, this::getClimbSpeed));
+    mDriverController.b().onTrue(new MoveDown(mClimbSubsystem, this::getClimbSpeed));
     configureBindings();
 
   }

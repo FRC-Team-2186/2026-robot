@@ -1,20 +1,20 @@
 package frc.robot.commands;
 
-import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
+//import frc.robot.Constants.OperatorConstants;
+//import frc.robot.commands.Autos;
 import frc.robot.subsystems.ClimbSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
-import swervelib.SwerveDrive;
+//import frc.robot.subsystems.SwerveSubsystem;
+//import swervelib.SwerveDrive;
 
-import java.io.File;
+//import java.io.File;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Filesystem;
+//import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.Commands;
+//import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 public class MoveDown extends Command{
@@ -34,18 +34,18 @@ public class MoveDown extends Command{
     //zeroes the gyro
     @Override
     public void initialize(){
-        mClimbSubsystem.zeroGyro();
+        //mClimbSubsystem.zeroGyro(); add this line after drivetrain is created
     }
 
 
     //the speed in constants is used to lift the hook
     @Override
      public void execute(){
-        if(mSpeedProvider > 0){
+        if(mSpeedProvider.getAsDouble() > 0){
             if(m_bottomlimitSwitch.get()){
-                mClimbMotor.set(0);
+                mClimbSubsystem.mClimbMotor.set(0);
             } else {
-                mClimbMotor.set(mSpeedProvider);
+                mClimbSubsystem.mClimbMotor.set(mSpeedProvider.getAsDouble());
             }
         }
         
@@ -54,7 +54,6 @@ public class MoveDown extends Command{
 
 
     //it ends when the speed is zero
-    @Override
      public void end(){
         mClimbSubsystem.mClimbMotor.set(0);
      }

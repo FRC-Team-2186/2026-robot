@@ -11,19 +11,25 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 
 import com.revrobotics.PersistMode;
+//import com.revrobotics.RelativeEncoder;
 import com.revrobotics.ResetMode;
+//import com.revrobotics.spark.ClosedLoopSlot;
+//import com.revrobotics.spark.SparkBase.ControlType;
+//import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+
+//import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.utils.CommandsLogging;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
-import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
+//import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+//import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 
 /**
@@ -126,10 +132,11 @@ public class Robot extends LoggedRobot {
   @Override
   public void teleopPeriodic() {
     //setting motor speed for the moving up and down of the climb commands
-    setMotorSpeed(mDriverController.setMotorSpeed(2));
-  }
-
-  @Override
+    ///////////////////////////////////////////////////////////////.setMotorSpeed(mDriverController.getRawAxis(2)); uh
+      
+}
+    
+      @Override
   public void testInit() {
     // Cancels all running commands at the start of test mode.
     CommandScheduler.getInstance().cancelAll();
@@ -149,7 +156,7 @@ public class Robot extends LoggedRobot {
     SparkMax motor = new SparkMax(10, MotorType.kBrushless);
     SparkMaxConfig config = new SparkMaxConfig();
     //Reset and apply empty default config
-    motor.config(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersist);
+    motor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
   }
 
   /** This function is called periodically whilst in simulation. */
