@@ -1,18 +1,15 @@
 package frc.robot.commands;
 
-
 import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
-
 public class IntakePivot extends Command {
-
 
     private IntakeSubsystem mIntakeSubsystem;
     private DoubleSupplier mSpeedProvider;
 
-
+    //Initialization
     public IntakePivot(IntakeSubsystem subsystem, DoubleSupplier speed){
         mIntakeSubsystem = subsystem;
         mSpeedProvider = speed;
@@ -21,31 +18,26 @@ public class IntakePivot extends Command {
    
     @Override
     public void initialize(){
-        // System.out.println("initialize");
+       System.out.println("initialize");
     }
 
-
+    //Starting the pivot motor to turn the motor
     @Override
     public void execute(){
-        // System.out.println("executing");
+        System.out.println("executing");
         mIntakeSubsystem.mPivotIntakeMotor.set(mSpeedProvider.getAsDouble());
     }
 
-
+    //If the method is finished, return false
     @Override
     public boolean isFinished(){
         return false;
     }
 
-
+    //When button is unpressed, stop the motor
     @Override
     public void end(boolean interupted){
-        // System.out.println("end");
+        System.out.println("end");
         mIntakeSubsystem.mPivotIntakeMotor.set(0);
-   
+    }
 }
-}
-
-
-
-

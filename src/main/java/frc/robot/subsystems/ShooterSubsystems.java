@@ -19,32 +19,15 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.Command;
 
-//Joystick Button
-
 @SuppressWarnings("unused")
 public class ShooterSubsystems extends SubsystemBase {
 
-  /*
-  private final SparkMax m_motor = new SparkMax(27, MotorType.kBrushless);
-  private final SparkMax m2_motor = new SparkMax(28, MotorType.kBrushless);
-  private final SparkMax m3_motor = new SparkMax(23, MotorType.kBrushless);
-  */
-
-  private final SparkMax m_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelMotorCanId, MotorType.kBrushless);
-  private final SparkMax m2_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
+  //Initializing the 3 motors
+  public final SparkMax m_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelMotorCanId, MotorType.kBrushless);
+  public final SparkMax m2_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
   public final SparkMax m3_motor = new SparkMax(Constants.ShooterSubsystemConstants.kFeederMotorCanId, MotorType.kBrushless);
-  
-  public static boolean isFeederWorking = false;
 
-  public static void madeFeederTrue(){
-    isFeederWorking = true;
-  }
-
-  public static void madeFeederFalse(){
-    isFeederWorking = false;
-  }
-  
-
+  //Setting the motors to their current settings and overwriting previous configs.
   public ShooterSubsystems() {
     System.out.println("Working Shooter");
 
@@ -54,61 +37,18 @@ public class ShooterSubsystems extends SubsystemBase {
 
     configs.inverted(true);
     configs2.inverted(false);
-    configs3.inverted(false);
-
+    configs3.inverted(true);
 
     m_motor.configure(configs, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m2_motor.configure(configs2, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     m3_motor.configure(configs3, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
-  
   }
 
-  // Method to run the motor at the desired speed from the button press
-  public Command runMotor(double velocity) {
-    return run(() -> {
-      m_motor.setVoltage(velocity);
-      m2_motor.setVoltage(velocity);
-    });
+  //Shows the voltage of the 3 motors in the dashboard
+  @Override
+  public void periodic() {
+    SmartDashboard.putNumber("Motor 1 (Left Shooter)",m_motor.getBusVoltage());
+    SmartDashboard.putNumber("Motor 2 (Right Shooter)",m2_motor.getBusVoltage());
+    SmartDashboard.putNumber("Motor 3 (Feeder)",m3_motor.getBusVoltage());
   }
-
-  public Command stopMotor() {
-    return run(() -> {
-      m_motor.setVoltage(0);
-      m2_motor.setVoltage(0);
-    });
-  }
-
-  /*
-  public Command checkFeeder() {
-    if (isFeederWorking == false){
-      madeFeederTrue();
-      System.out.println("Running");
-      System.out.println(isFeederWorking);
-      return runFeeder();
-    } else {
-      madeFeederFalse();
-      System.out.println("Stopping");
-      System.out.println(isFeederWorking);
-      return stopFeeder();
-    }
-  }
-
-  
-  public Command runFeeder() {
-    return run(() -> {
-      m3_motor.setVoltage(6);
-    });
-  }
-
-  public void end(boolean interrupted){
-    m3_motor.setVoltage(0);
-  }
-
-  public Command stopFeeder() {
-    return run(() -> {
-      m3_motor.setVoltage(0);
-    });
-  }
-  */
-
 }

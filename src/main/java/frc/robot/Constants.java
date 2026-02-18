@@ -10,7 +10,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Velocity;
@@ -28,14 +27,15 @@ import edu.wpi.first.units.measure.Velocity;
 public final class Constants {
   public static final LinearVelocity DRIVE_MAX_SPEED = FeetPerSecond.of(12);
 
-  /*
+  /* Test CAN ID's
   public static  final int FuelIntakeCanID = 10;
   public static final int PivotIntakeCanID = 22;
-` */
+  */
   
   public static  final int FuelIntakeCanID = 24;
   public static final int PivotIntakeCanID = 11;
-  
+
+  public static final int ClimbMotorCanID = 0;
 
   public static final double IntakeSpeed = 0.5;
 
@@ -47,13 +47,11 @@ public final class Constants {
   public static final class ShooterSubsystemConstants {
     public static final double FeederSpeed = 6;
     
-    
     public static final int kFeederMotorCanId = 28;    // SPARK Flex CAN ID
     public static final int kFlywheelMotorCanId = 27;  // SPARK Flex CAN ID (Right)
     public static final int kFlywheelFollowerMotorCanId = 23;  // SPARK Flex CAN ID (Left)
-    
 
-    /*
+  /* Test CAN ID's 
     public static final int kFeederMotorCanId = 22;    // SPARK Flex CAN ID
     public static final int kFlywheelMotorCanId = 10;  // SPARK Flex CAN ID (Right)
     public static final int kFlywheelFollowerMotorCanId = 25;  // SPARK Flex CAN ID (Left)
@@ -94,5 +92,4 @@ public final class Constants {
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
   }
-
 }
