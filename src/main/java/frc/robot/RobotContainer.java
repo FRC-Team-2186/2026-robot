@@ -8,6 +8,7 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
+import swervelib.SwerveInputStream;
 
 import java.io.File;
 
@@ -31,6 +32,19 @@ public class RobotContainer {
 
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
 
+  SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
+      mSwerveDrive.getSwerveDrive(), //
+      () -> mDriverController.getLeftY() * -1, //
+      () -> -mDriverController.getLeftX()) //
+      .withControllerRotationAxis(() -> -mDriverController.getRightX()) //
+      .deadband(0.1) //
+      .scaleTranslation(0.8) //
+      .allianceRelativeControl(false);
+
+  SwerveInputStream mDriveRobotOriented = mDriveFieldOriented.copy() //
+      .robotRelative(true) //
+      .allianceRelativeControl(false);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
@@ -45,6 +59,11 @@ public class RobotContainer {
    * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight joysticks}.
    */
   private void configureBindings() {
+    var defaultDriveCommand = mSwerveDrive.driveFieldOrientedCommand(mDriveFieldOriented);
+
+    mSwerveDrive.setDefaultCommand(defaultDriveCommand);
+
+    mDriverController.a().onTrue(mSwerveDrive.zeroGyroCommand());
   }
 
   /**
