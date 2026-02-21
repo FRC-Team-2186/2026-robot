@@ -13,6 +13,7 @@ import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
 import frc.robot.commands.IntakeFuel;
 import frc.robot.commands.IntakePivot;
+import swervelib.SwerveInputStream;
 import java.io.File;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -28,6 +29,7 @@ import frc.robot.commands.RunMotor;
  * little robot logic should actually be handled in the {@link Robot} periodic methods (other than the scheduler calls).
  * Instead, the structure of the robot (including subsystems, commands, and trigger mappings) should be declared here.
  */
+@SuppressWarnings("unused")
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
@@ -40,6 +42,19 @@ public class RobotContainer {
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
   private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
+
+  SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
+    mSwerveDrive.getSwerveDrive(), //
+    () -> mDriverController.getLeftY() * -1, //
+    () -> -mDriverController.getLeftX()) //
+    .withControllerRotationAxis(() -> -mDriverController.getRightX()) //
+    .deadband(0.1) //
+    .scaleTranslation(0.8) //
+    .allianceRelativeControl(false);
+
+  SwerveInputStream mDriveRobotOriented = mDriveFieldOriented.copy() //
+    .robotRelative(true) //
+    .allianceRelativeControl(false);
 
   public double getIntakeSpeed(){
     return Constants.IntakeSpeed;
@@ -66,7 +81,11 @@ public class RobotContainer {
 
   private void configureBindings() {
     //Moving the robot
-      
+    var defaultDriveCommand = mSwerveDrive.driveFieldOrientedCommand(mDriveFieldOriented);
+
+    mSwerveDrive.setDefaultCommand(defaultDriveCommand);
+
+    mDriverController.a().onTrue(mSwerveDrive.zeroGyroCommand());
 
     //Controlling the Feeder Motor
     mOperatorController.a().whileTrue(new FeederCommand(shooter));
@@ -77,11 +96,13 @@ public class RobotContainer {
     mOperatorController.b().whileTrue(new RunMotor(shooter, 7));
     
     //Controlling the Paddles for Intake
-    mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeedReverse));
+    //mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeed));
 
+
+
     //Controlling the Pivot Point for Intake 
-    mOperatorController.leftBumper().onTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeedReverse));
+    mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeedReverse));
     mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeed));
   }
 

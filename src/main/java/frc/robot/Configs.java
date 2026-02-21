@@ -151,5 +151,4 @@ public final class Configs {
         .smartCurrentLimit(60);
     }
   }
-
 }

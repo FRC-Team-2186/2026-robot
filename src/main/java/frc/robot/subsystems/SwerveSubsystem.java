@@ -1,29 +1,40 @@
 package frc.robot.subsystems;
 
 import java.io.File;
+import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.LinearVelocity;
+
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import swervelib.SwerveController;
 import swervelib.SwerveDrive;
+import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
-@SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
+  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(13.5);
+
   private final SwerveDrive mSwerveDrive;
 
   public SwerveSubsystem(File pConfigDir) {
@@ -70,11 +81,19 @@ public class SwerveSubsystem extends SubsystemBase {
     }
   }
 
+  public Command zeroGyroWithAliianceCommand() {
+    return runOnce(this::zeroGyroCommand);
+  }
+
   /**
    * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
    */
   public void zeroGyro() {
     mSwerveDrive.zeroGyro();
+  }
+
+  public Command zeroGyroCommand() {
+    return runOnce(this::zeroGyro);
   }
 
   /**
@@ -121,6 +140,41 @@ public class SwerveSubsystem extends SubsystemBase {
    */
   public SwerveDrive getSwerveDrive() {
     return mSwerveDrive;
+  }
+
+  public SwerveController getSwerveController() {
+    return mSwerveDrive.getSwerveController();
+  }
+
+  public ChassisSpeeds convertOperatorInputToChassisSpeeds(double pTranslationX, double pTranslationY, double pRotateX,
+      double pRotateY) {
+    var scaled = SwerveMath.cubeTranslation(new Translation2d(pTranslationX, pTranslationY));
+
+    return getSwerveController().getTargetSpeeds(scaled.getX(), scaled.getY(), pRotateX, pRotateY,
+        getHeading().getRadians(), MAX_SPEED.in(MetersPerSecond));
+  }
+
+  public Command driveRobotOrientedCommand(DoubleSupplier pTranslationX, DoubleSupplier pTranslationY,
+      DoubleSupplier pAngularRotation) {
+    return run(() -> {
+      var translation = new Translation2d(pTranslationX.getAsDouble(), pTranslationY.getAsDouble())
+          .times(getSwerveDrive().getMaximumChassisVelocity());
+      var scaled = SwerveMath.scaleTranslation(translation, 0.8);
+
+      var rotation = Math.pow(pAngularRotation.getAsDouble(), 3) * getSwerveDrive().getMaximumChassisAngularVelocity();
+
+      mSwerveDrive.drive(scaled, rotation, true, false);
+    });
+  }
+
+  public Command driveFieldOrientedCommand(Supplier<ChassisSpeeds> pSpeedsSupplier) {
+    return run(() -> {
+      mSwerveDrive.driveFieldOriented(pSpeedsSupplier.get());
+    });
+  }
+
+  public void driveFieldOriented(ChassisSpeeds velocity) {
+    mSwerveDrive.driveFieldOriented(velocity);
   }
 
   /**

@@ -21,6 +21,7 @@ import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Rebu
  * the Main.java file in the project.
  */
 
+@SuppressWarnings("unused")
 public class Robot extends LoggedRobot {
 
   private Command m_autonomousCommand;
