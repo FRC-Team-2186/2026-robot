@@ -3,10 +3,8 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
-
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
-
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.FeetPerSecond;
@@ -15,7 +13,6 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,7 +29,10 @@ import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
+@SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
+
+  
   private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(13.5);
 
   private final SwerveDrive mSwerveDrive;
@@ -142,6 +142,16 @@ public class SwerveSubsystem extends SubsystemBase {
     return mSwerveDrive;
   }
 
+  /**
+   * Checks if the alliance is red, defaults to false if alliance isn't available.
+   *
+   * @return true if the red alliance, false if blue. Defaults to false if none is available.
+   */
+  private boolean isRedAlliance() {
+    var alliance = DriverStation.getAlliance();
+    return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
+  }
+
   public SwerveController getSwerveController() {
     return mSwerveDrive.getSwerveController();
   }
@@ -175,15 +185,5 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveFieldOriented(ChassisSpeeds velocity) {
     mSwerveDrive.driveFieldOriented(velocity);
-  }
-
-  /**
-   * Checks if the alliance is red, defaults to false if alliance isn't available.
-   *
-   * @return true if the red alliance, false if blue. Defaults to false if none is available.
-   */
-  private boolean isRedAlliance() {
-    var alliance = DriverStation.getAlliance();
-    return alliance.isPresent() ? alliance.get() == DriverStation.Alliance.Red : false;
   }
 }
