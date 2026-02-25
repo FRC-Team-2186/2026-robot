@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.commands.RunMotor;
+import frc.robot.commands.RunFlywheel;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -34,31 +34,30 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  private CommandXboxController mDriverController = new CommandXboxController(
-      OperatorConstants.kDriverControllerPort);
-  private  CommandXboxController mOperatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
+  private CommandXboxController mDriverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  private CommandXboxController mOperatorController = new CommandXboxController(
+      OperatorConstants.kOperatorControllerPort);
 
-  ShooterSubsystem shooter = new ShooterSubsystem();
+  private final ShooterSubsystem mShooterSubsystem = new ShooterSubsystem();
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
-  //private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
+  // private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
 
   SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
-    mSwerveDrive.getSwerveDrive(), //
-    () -> mDriverController.getLeftY() * -1, //
-    () -> -mDriverController.getLeftX()) //
-    .withControllerRotationAxis(() -> -mDriverController.getRightX()) //
-    .deadband(0.1) //
-    .scaleTranslation(0.8) //
-    .allianceRelativeControl(false);
+      mSwerveDrive.getSwerveDrive(), //
+      () -> mDriverController.getLeftY() * -1, //
+      () -> -mDriverController.getLeftX()) //
+      .withControllerRotationAxis(() -> -mDriverController.getRightX()) //
+      .deadband(0.1) //
+      .scaleTranslation(0.8) //
+      .allianceRelativeControl(false);
 
   SwerveInputStream mDriveRobotOriented = mDriveFieldOriented.copy() //
-    .robotRelative(true) //
-    .allianceRelativeControl(false);
+      .robotRelative(true) //
+      .allianceRelativeControl(false);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    System.out.println("Working");
     // Configure the trigger bindings
     configureBindings();
   }
@@ -72,30 +71,28 @@ public class RobotContainer {
    */
 
   private void configureBindings() {
-    //Moving the robot
+    // Moving the robot
     var defaultDriveCommand = mSwerveDrive.driveFieldOrientedCommand(mDriveFieldOriented);
 
     mSwerveDrive.setDefaultCommand(defaultDriveCommand);
 
     mDriverController.a().onTrue(mSwerveDrive.zeroGyroCommand());
 
-    //Controlling the Feeder Motor
-    mOperatorController.a().whileTrue(new FeederCommand(shooter));
-    
-    //Controlling the shooter
-    mOperatorController.x().whileTrue(new RunMotor(shooter, 3));
-    mOperatorController.y().whileTrue(new RunMotor(shooter, 5));
-    mOperatorController.b().whileTrue(new RunMotor(shooter, 7));
-    
-    //Controlling the Paddles for Intake
+    // Controlling the Feeder Motor
+    mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
+
+    // Controlling the shooter
+    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
+    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 5));
+    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
+
+    // Controlling the Paddles for Intake
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
 
-
-
-    //Controlling the Pivot Point for Intake 
+    // Controlling the Pivot Point for Intake
     mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
-    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));  
+    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));
   }
 
   /**

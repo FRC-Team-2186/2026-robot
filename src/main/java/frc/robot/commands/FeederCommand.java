@@ -6,28 +6,28 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants;
 
 @SuppressWarnings("unused")
-public class FeederCommand extends Command{
-  
+public class FeederCommand extends Command {
+
   ShooterSubsystem shooter;
 
-  //Initialization
-  public FeederCommand(ShooterSubsystem shooter){
+  // Initialization
+  public FeederCommand(ShooterSubsystem shooter) {
     this.shooter = shooter;
   }
 
   @Override
-  public void initialize(){}
+  public void initialize() {
+  }
 
-  //Running the motor at constant value
+  // Running the motor at constant value
   @Override
   public void execute() {
     shooter.setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
-    System.out.println("Running Feeder");
   }
 
-  //Stopping the motor when button lifted up
+  // Stopping the motor when button lifted up
   @Override
-  public void end(boolean interrupted){
+  public void end(boolean interrupted) {
     shooter.setFeederMotorVoltage(0);
   }
 }

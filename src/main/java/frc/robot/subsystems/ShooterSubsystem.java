@@ -11,6 +11,8 @@ import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.GenericEntry;
@@ -83,19 +85,13 @@ public class ShooterSubsystem extends SubsystemBase {
 
     SparkMaxConfig leaderShooterMotorconfig = new SparkMaxConfig();
     SparkMaxConfig followerShooterMotorconfig = new SparkMaxConfig();
-    SparkMaxConfig feederShooterMotorconfig = new SparkMaxConfig();
 
-    leaderShooterMotorconfig.inverted(true);
-    followerShooterMotorconfig.follow(mLeaderShooterMotor, true);
-    feederShooterMotorconfig.inverted(true);
-    
-    //leaderShooterMotorconfig.closedLoop.feedForward.kV(Constants.kFF);
+    leaderShooterMotorconfig.idleMode(IdleMode.kCoast);
+    followerShooterMotorconfig.idleMode(IdleMode.kCoast).follow(mLeaderShooterMotor, true);
 
     mLeaderShooterMotor.configure(leaderShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
     mFollowerShooterMotor.configure(followerShooterMotorconfig, ResetMode.kNoResetSafeParameters,
-        PersistMode.kNoPersistParameters);
-    mFeederShooterMotor.configure(feederShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
   }
@@ -119,8 +115,11 @@ public class ShooterSubsystem extends SubsystemBase {
   // Shows the voltage of the 3 motors in the dashboard
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Motor 1 (Left Shooter)", mLeaderShooterMotor.getBusVoltage());
-    SmartDashboard.putNumber("Motor 2 (Right Shooter)", mFollowerShooterMotor.getBusVoltage());
-    SmartDashboard.putNumber("Motor 3 (Feeder)", mFeederShooterMotor.getBusVoltage());
+    SmartDashboard.putNumber("Flywheel (Leader) Applied Voltage",
+        mLeaderShooterMotor.getAppliedOutput() * mLeaderShooterMotor.getBusVoltage());
+    SmartDashboard.putNumber("Flywheel (Follower)",
+        mFollowerShooterMotor.getAppliedOutput() * mFollowerShooterMotor.getBusVoltage());
+    SmartDashboard.putNumber("Flywheel RPM", mLeaderShooterMotor.getEncoder().getVelocity());
+    SmartDashboard.putNumber("Feeder", mFeederShooterMotor.getBusVoltage());
   }
 }

@@ -32,7 +32,6 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 @SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
 
-  
   private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(13.5);
 
   private final SwerveDrive mSwerveDrive;
@@ -69,8 +68,7 @@ public class SwerveSubsystem extends SubsystemBase {
   /**
    * This will zero (calibrate) the robot to assume the current position is facing forward
    * <p>
-   * If red alliance rotate the robot 180 after the drviebase zero command
-   * hi :)
+   * If red alliance rotate the robot 180 after the drviebase zero command hi :)
    */
   public void zeroGyroWithAlliance() {
     if (isRedAlliance()) {

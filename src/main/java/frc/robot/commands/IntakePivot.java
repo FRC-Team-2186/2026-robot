@@ -1,48 +1,39 @@
 package frc.robot.commands;
 
-import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 
 public class IntakePivot extends Command {
 
-    private IntakeSubsystem mIntakeSubsystem;
-    private double mSpeed;
+  private IntakeSubsystem mIntakeSubsystem;
+  private double mSpeed;
 
-    //Initialization
-    public IntakePivot(IntakeSubsystem subsystem, double pivotintakespeedreverse){
-        mIntakeSubsystem = subsystem;
-        mSpeed = pivotintakespeedreverse;
-        addRequirements(mIntakeSubsystem);
-    }
-   
-    @Override
-    public void initialize(){
-       System.out.println("initialize");
-    }
+  // Initialization
+  public IntakePivot(IntakeSubsystem subsystem, double pivotintakespeedreverse) {
+    mIntakeSubsystem = subsystem;
+    mSpeed = pivotintakespeedreverse;
+    addRequirements(mIntakeSubsystem);
+  }
 
-    //Starting the pivot motor to turn the motor
-    @Override
-    public void execute(){
+  @Override
+  public void initialize() {
+  }
 
-        System.out.println("executing");
-        //System.out.println(mIntakeSubsystem.mPivotIntakeMotor.get());
-        //System.out.println(mIntakeSubsystem.mPivotIntakeMotorRight.get());
-        mIntakeSubsystem.setPivotMotorSetpoint(mSpeed);
-    }
+  // Starting the pivot motor to turn the motor
+  @Override
+  public void execute() {
+    mIntakeSubsystem.setPivotMotorSetpoint(mSpeed);
+  }
 
-    //If the command is finished, return true
-    @Override
-    public boolean isFinished(){
-        // System.out.println("isFinished");
+  // If the command is finished, return true
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 
-        return false;
-    }
-
-    //When button is unpressed, stop the motor
-    @Override
-    public void end(boolean interupted){
-        System.out.println("end");
-        mIntakeSubsystem.setPivotMotorSetpoint(0);
-    }
+  // When button is unpressed, stop the motor
+  @Override
+  public void end(boolean interupted) {
+    mIntakeSubsystem.setPivotMotorSetpoint(0);
+  }
 }
