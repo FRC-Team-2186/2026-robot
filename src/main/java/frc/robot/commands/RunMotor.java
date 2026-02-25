@@ -24,15 +24,15 @@ public class RunMotor extends Command{
   //Starts both motors at the given speed
   @Override
   public void execute() {
-    shooter.m_motor.setVoltage(speed);
-    shooter.m2_motor.setVoltage(speed);
+    shooter.setShooterSubsystemMotorVoltage(speed);
+    shooter.setShooterSubsystemMotorVoltage(speed);
     System.out.println("Running Motor");  
   }
 
   //Stops both motors when the button is let go of
   @Override
   public void end(boolean interrupted){
-    shooter.m_motor.setVoltage(0);
-    shooter.m2_motor.setVoltage(0);
+    shooter.setShooterSubsystemMotorVoltage(0);
+    shooter.setShooterSubsystemMotorVoltage(0);
   }
 }

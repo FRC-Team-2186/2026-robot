@@ -41,7 +41,7 @@ public class RobotContainer {
   ShooterSubsystems shooter = new ShooterSubsystems();
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
-  private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
+  //private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
 
   SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
     mSwerveDrive.getSwerveDrive(), //
@@ -55,14 +55,6 @@ public class RobotContainer {
   SwerveInputStream mDriveRobotOriented = mDriveFieldOriented.copy() //
     .robotRelative(true) //
     .allianceRelativeControl(false);
-
-  public double getIntakeSpeed(){
-    return Constants.IntakeSpeed;
-  }
-
-  public double getIntakeSpeedReverse(){
-    return Constants.IntakeSpeed * -1;
-  }
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -96,14 +88,14 @@ public class RobotContainer {
     mOperatorController.b().whileTrue(new RunMotor(shooter, 7));
     
     //Controlling the Paddles for Intake
-    //mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeedReverse));
-    mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, this::getIntakeSpeed));
+    mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
+    mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
 
 
 
     //Controlling the Pivot Point for Intake 
-    mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeedReverse));
-    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, this::getIntakeSpeed));
+    mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
+    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));  
   }
 
   /**

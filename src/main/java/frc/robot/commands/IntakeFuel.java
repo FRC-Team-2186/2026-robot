@@ -7,12 +7,12 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class IntakeFuel extends Command {
 
     IntakeSubsystem mIntakeSubsystem;
-    DoubleSupplier mSpeedProvider;
+    double mSpeedProvider;
    
     //Initialization
-    public IntakeFuel(IntakeSubsystem subsystem, DoubleSupplier speed){
+    public IntakeFuel(IntakeSubsystem subsystem, double fuelintakespeedreverse){
         mIntakeSubsystem = subsystem;
-        mSpeedProvider = speed;
+        mSpeedProvider = fuelintakespeedreverse;
         addRequirements(mIntakeSubsystem);
     }
 
@@ -23,7 +23,7 @@ public class IntakeFuel extends Command {
     @Override
     public void execute(){
         System.out.println("executing");
-        mIntakeSubsystem.mFuelIntakeMotor.set(mSpeedProvider.getAsDouble());
+        mIntakeSubsystem.setPivotMotorSetpoint(mSpeedProvider);
     }
 
     //If the method is finished, return false
@@ -36,6 +36,6 @@ public class IntakeFuel extends Command {
     @Override
     public void end(boolean interupted){
         System.out.println("end");
-        mIntakeSubsystem.mFuelIntakeMotor.set(0);
+        mIntakeSubsystem.setPivotMotorSetpoint(0);
     }
 }

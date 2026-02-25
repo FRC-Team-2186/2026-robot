@@ -60,15 +60,19 @@ public final class Constants {
   public static final double kHighRpm = 5700.0;
   
   public static  final int FuelIntakeCanID = 24;
-  public static final int PivotIntakeCanID = 11;
+  public static final int PivotIntakeCanID = 26;
+  //public static final int PivotIntakeFollowerCanID = 11;
 
   public static final int ClimbMotorCanID = 0;
 
-  public static final double IntakeSpeed = 0.5;
+  public static final double fuelIntakeSpeed = 0.5;
+  public static final double fuelIntakeSpeedReverse = -0.5;
+  public static final double PivotIntakeSpeed = 1;
+  public static final double PivotIntakeSpeedReverse = -1;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int kOperatorControllerPort = 1                                                                             ;
+    public static final int kOperatorControllerPort = 1;
   }
 
   public static final class ShooterSubsystemConstants {

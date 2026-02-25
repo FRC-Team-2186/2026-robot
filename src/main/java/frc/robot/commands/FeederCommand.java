@@ -21,13 +21,13 @@ public class FeederCommand extends Command{
   //Running the motor at constant value
   @Override
   public void execute() {
-    shooter.m3_motor.setVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    shooter.setFeederSubsystemMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
     System.out.println("Running Feeder");
   }
 
   //Stopping the motor when button lifted up
   @Override
   public void end(boolean interrupted){
-    shooter.m3_motor.setVoltage(0);
+    shooter.setFeederSubsystemMotorVoltage(0);
   }
 }

@@ -25,17 +25,17 @@ public class MoveUp extends Command{
   public void execute(){
     if(mSpeedProvider.getAsDouble() > 0){
       if(m_toplimitSwitch.get()){
-        mClimbSubsystem.mClimbMotor.setVoltage(0);
+        mClimbSubsystem.setClimbMotorSetPoint(0);
       } else {
-        mClimbSubsystem.mClimbMotor.setVoltage(mSpeedProvider.getAsDouble());
+        mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
       }
     }
-    mClimbSubsystem.mClimbMotor.setVoltage(mSpeedProvider.getAsDouble());
+    mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
   }
 
   //Stopping when button press is over
   public void end(){
-    mClimbSubsystem.mClimbMotor.setVoltage(0);
+    mClimbSubsystem.setClimbMotorSetPoint(0);
   }
 
   //Doesn't finish until end

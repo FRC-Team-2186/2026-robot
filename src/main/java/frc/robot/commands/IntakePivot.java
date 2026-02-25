@@ -7,12 +7,12 @@ import frc.robot.subsystems.IntakeSubsystem;
 public class IntakePivot extends Command {
 
     private IntakeSubsystem mIntakeSubsystem;
-    private DoubleSupplier mSpeedProvider;
+    private double mSpeed;
 
     //Initialization
-    public IntakePivot(IntakeSubsystem subsystem, DoubleSupplier speed){
+    public IntakePivot(IntakeSubsystem subsystem, double pivotintakespeedreverse){
         mIntakeSubsystem = subsystem;
-        mSpeedProvider = speed;
+        mSpeed = pivotintakespeedreverse;
         addRequirements(mIntakeSubsystem);
     }
    
@@ -24,13 +24,18 @@ public class IntakePivot extends Command {
     //Starting the pivot motor to turn the motor
     @Override
     public void execute(){
+
         System.out.println("executing");
-        mIntakeSubsystem.mPivotIntakeMotor.set(mSpeedProvider.getAsDouble());
+        //System.out.println(mIntakeSubsystem.mPivotIntakeMotor.get());
+        //System.out.println(mIntakeSubsystem.mPivotIntakeMotorRight.get());
+        mIntakeSubsystem.setPivotMotorSetpoint(mSpeed);
     }
 
-    //If the method is finished, return false
+    //If the command is finished, return true
     @Override
     public boolean isFinished(){
+        // System.out.println("isFinished");
+
         return false;
     }
 
@@ -38,6 +43,6 @@ public class IntakePivot extends Command {
     @Override
     public void end(boolean interupted){
         System.out.println("end");
-        mIntakeSubsystem.mPivotIntakeMotor.set(0);
+        mIntakeSubsystem.setPivotMotorSetpoint(0);
     }
 }

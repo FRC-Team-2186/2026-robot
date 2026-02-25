@@ -25,17 +25,17 @@ public class MoveDown extends Command{
   public void execute(){
     if(mSpeedProvider.getAsDouble() > 0){
       if(m_bottomlimitSwitch.get()){
-        mClimbSubsystem.mClimbMotor.setVoltage(0);
+        mClimbSubsystem.setClimbMotorSetPoint(0);
       } else {
-        mClimbSubsystem.mClimbMotor.setVoltage(mSpeedProvider.getAsDouble());
+        mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
       }
     }
-    mClimbSubsystem.mClimbMotor.setVoltage(mSpeedProvider.getAsDouble());
+    mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
   }
 
   //Sets the voltage to 0 when the code is finished running
   public void end(){
-    mClimbSubsystem.mClimbMotor.setVoltage(0);
+    mClimbSubsystem.setClimbMotorSetPoint(0);
   }
 
   //Doesn't until it ends

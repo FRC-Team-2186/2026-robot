@@ -8,9 +8,17 @@ import frc.robot.Constants;
 
 public class ClimbSubsystem extends SubsystemBase{
   //Initializing a new motor
-  public final SparkMax mClimbMotor = new SparkMax(Constants.ClimbMotorCanID, MotorType.kBrushless);
+  private final SparkMax mClimbMotor = new SparkMax(Constants.ClimbMotorCanID, MotorType.kBrushless);
 
   public ClimbSubsystem(){}
+
+  public double getClimbMotorSetPoint() {
+    return mClimbMotor.getBusVoltage();
+  }
+
+  public void setClimbMotorSetPoint(double newClimbMotorSetPoint){
+    mClimbMotor.setVoltage(newClimbMotorSetPoint);
+  }
 
   //Showing the voltage of the climbing motor on the Dashboard
   @Override

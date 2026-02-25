@@ -80,28 +80,28 @@ public final class Configs {
           .positionWrappingInputRange(0, turningFactor);
     }
   }
-
+/*
   public static final class IntakeSubsystem {
     public static final SparkFlexConfig intakeConfig = new SparkFlexConfig();
     public static final SparkFlexConfig conveyorConfig = new SparkFlexConfig();
 
-    static {
-      // Configure basic settings of the intake motor
-      intakeConfig
-        .inverted(false)
-        .idleMode(IdleMode.kCoast)
-        .openLoopRampRate(0.5)
-        .smartCurrentLimit(40);
+  //   static {
+  //     // Configure basic settings of the intake motor
+  //     intakeConfig
+  //       .inverted(false)
+  //       .idleMode(IdleMode.kCoast)
+  //       .openLoopRampRate(0.5)
+  //       .smartCurrentLimit(40);
 
-      // Configure basic settings of the conveyor motor
-      conveyorConfig
-        .inverted(true)
-        .idleMode(IdleMode.kCoast)
-        .openLoopRampRate(0.5)
-        .smartCurrentLimit(40);
-    }
+  //     // Configure basic settings of the conveyor motor
+  //     conveyorConfig
+  //       .inverted(true)
+  //       .idleMode(IdleMode.kCoast)
+  //       .openLoopRampRate(0.5)
+  //       .smartCurrentLimit(40);
+  //   }
   }
-
+*/
   public static final class ShooterSubsystem {
     public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
     public static final SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
