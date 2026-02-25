@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.RunFlywheel;
 
 /**
@@ -82,9 +83,13 @@ public class RobotContainer {
     mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
 
     // Controlling the shooter
-    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
-    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 5));
-    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
+    // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
+    // mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 5));
+    // mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
+    mOperatorController.a().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kForward));
+    mOperatorController.b().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kReverse));
+    mOperatorController.x().whileTrue(mShooterSubsystem.sysIdDynamic(Direction.kForward));
+    mOperatorController.y().whileTrue(mShooterSubsystem.sysIdDynamic(Direction.kReverse));
 
     // Controlling the Paddles for Intake
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
