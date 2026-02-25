@@ -6,9 +6,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 
 public class MoveUp extends Command{
-  ClimbSubsystem mClimbSubsystem ;
+  ClimbSubsystem mClimbSubsystem;
   DoubleSupplier mSpeedProvider;
-  DigitalInput m_toplimitSwitch = new DigitalInput(0);
 
   //Initialization
   public MoveUp(ClimbSubsystem mClimbSubsystem, DoubleSupplier mSpeedProvider){
@@ -24,13 +23,13 @@ public class MoveUp extends Command{
   @Override
   public void execute(){
     if(mSpeedProvider.getAsDouble() > 0){
-      if(m_toplimitSwitch.get()){
-        mClimbSubsystem.setClimbMotorSetPoint(0);
-      } else {
         mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
       }
-    }
+    
     mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
+    double requestedSpeed = mSpeedProvider.getAsDouble();
+    mClimbSubsystem.setClimbMotorSetPoint(requestedSpeed);
+
   }
 
   //Stopping when button press is over

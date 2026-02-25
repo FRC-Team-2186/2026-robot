@@ -40,6 +40,7 @@ public final class Constants {
   public static final double kMidVoltage = 8.0;
   public static final double kHighVoltage = 10.0;
 
+  /*
   public enum MotorTypeProfile {
     NEO,      // Standard NEO brushless motor
     VORTEX    // High-performance NEO Vortex motor
@@ -54,6 +55,7 @@ public final class Constants {
         (kMotorTypeProfile == MotorTypeProfile.NEO) ? kMaxRpm_SparkMaxNeo : kMaxRpm_FlexVortex;
 
   public static final double kFF = 12.0 / kMaxRpm_Motor;
+*/
 
   public static final double kLowRpm = 2000.0;
   public static final double kMidRpm = 3250.0;    

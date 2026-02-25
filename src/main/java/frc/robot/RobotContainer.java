@@ -4,8 +4,8 @@
 
 package frc.robot;
 
-import frc.robot.subsystems.ShooterSubsystems;
-import frc.robot.Configs.ShooterSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
+import frc.robot.Configs.ShooterSubsystems;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.FeederCommand;
@@ -38,7 +38,7 @@ public class RobotContainer {
       OperatorConstants.kDriverControllerPort);
   private  CommandXboxController mOperatorController = new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
-  ShooterSubsystems shooter = new ShooterSubsystems();
+  ShooterSubsystem shooter = new ShooterSubsystem();
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
   //private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();

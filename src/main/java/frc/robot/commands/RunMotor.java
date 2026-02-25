@@ -2,17 +2,17 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ShooterSubsystems;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants;
 
 @SuppressWarnings("unused")
 public class RunMotor extends Command{
 
-  ShooterSubsystems shooter;
+  ShooterSubsystem shooter;
   double speed;
 
   //Initialization
-  public RunMotor(ShooterSubsystems shooter, double speed){
+  public RunMotor(ShooterSubsystem shooter, double speed){
     this.shooter = shooter;
     this.speed = speed;
   }
@@ -24,15 +24,12 @@ public class RunMotor extends Command{
   //Starts both motors at the given speed
   @Override
   public void execute() {
-    shooter.setShooterSubsystemMotorVoltage(speed);
-    shooter.setShooterSubsystemMotorVoltage(speed);
-    System.out.println("Running Motor");  
+    shooter.setFlywheelMotorVoltage(speed);
   }
 
   //Stops both motors when the button is let go of
   @Override
   public void end(boolean interrupted){
-    shooter.setShooterSubsystemMotorVoltage(0);
-    shooter.setShooterSubsystemMotorVoltage(0);
+    shooter.setFlywheelMotorVoltage(0);
   }
 }

@@ -25,7 +25,7 @@ import frc.robot.Constants;
 import edu.wpi.first.wpilibj2.command.Command;
 
 @SuppressWarnings("unused")
-public class ShooterSubsystems extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase {
 
   public enum SetPointMode {
     RPM, VOLTAGE
@@ -72,7 +72,7 @@ public class ShooterSubsystems extends SubsystemBase {
       Constants.kHighVoltage };
 
   // Setting the motors to their current settings and overwriting previous configs.
-  public ShooterSubsystems() {
+  public ShooterSubsystem() {
 
     leaderRpmEntry = Shuffleboard.getTab("Shooter").add("Shooter Leader RPM", 0.0).withWidget(BuiltInWidgets.kGraph)
         .getEntry();
@@ -88,6 +88,8 @@ public class ShooterSubsystems extends SubsystemBase {
     leaderShooterMotorconfig.inverted(true);
     followerShooterMotorconfig.follow(mLeaderShooterMotor, true);
     feederShooterMotorconfig.inverted(true);
+    
+    //leaderShooterMotorconfig.closedLoop.feedForward.kV(Constants.kFF);
 
     mLeaderShooterMotor.configure(leaderShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
@@ -96,24 +98,21 @@ public class ShooterSubsystems extends SubsystemBase {
     mFeederShooterMotor.configure(feederShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
 
-    leaderShooterMotorconfig.closedLoop.feedForward.kV(Constants.kFF);
-    followerShooterMotorconfig.closedLoop.feedForward.kV(Constants.kFF);
-    feederShooterMotorconfig.closedLoop.feedForward.kV(Constants.kFF);
   }
 
-  public double getShooterSubsystemMotorVoltage() {
+  public double getFlywheelMotorVoltage() {
     return mLeaderShooterMotor.getBusVoltage();
   }
 
-  public void setShooterSubsystemMotorVoltage(double motorVoltage) {
+  public void setFlywheelMotorVoltage(double motorVoltage) {
     mLeaderShooterMotor.setVoltage(motorVoltage);
   }
 
-  public double getFeederSubsystemMotorVoltage() {
+  public double getFeederMotorVoltage() {
     return mFeederShooterMotor.getBusVoltage();
   }
 
-  public void setFeederSubsystemMotorVoltage(double feederSubsystemMotorVoltage) {
+  public void setFeederMotorVoltage(double feederSubsystemMotorVoltage) {
     mFeederShooterMotor.setVoltage(feederSubsystemMotorVoltage);
   }
 

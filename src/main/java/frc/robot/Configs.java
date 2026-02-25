@@ -102,7 +102,7 @@ public final class Configs {
   //   }
   }
 */
-  public static final class ShooterSubsystem {
+  public static final class ShooterSubsystems {
     public static final SparkFlexConfig flywheelConfig = new SparkFlexConfig();
     public static final SparkFlexConfig flywheelFollowerConfig = new SparkFlexConfig();
     public static final SparkFlexConfig feederConfig = new SparkFlexConfig();

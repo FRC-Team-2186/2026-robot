@@ -2,16 +2,16 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.ShooterSubsystems;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants;
 
 @SuppressWarnings("unused")
 public class FeederCommand extends Command{
   
-  ShooterSubsystems shooter;
+  ShooterSubsystem shooter;
 
   //Initialization
-  public FeederCommand(ShooterSubsystems shooter){
+  public FeederCommand(ShooterSubsystem shooter){
     this.shooter = shooter;
   }
 
@@ -21,13 +21,13 @@ public class FeederCommand extends Command{
   //Running the motor at constant value
   @Override
   public void execute() {
-    shooter.setFeederSubsystemMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    shooter.setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
     System.out.println("Running Feeder");
   }
 
   //Stopping the motor when button lifted up
   @Override
   public void end(boolean interrupted){
-    shooter.setFeederSubsystemMotorVoltage(0);
+    shooter.setFeederMotorVoltage(0);
   }
 }

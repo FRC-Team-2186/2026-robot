@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 public class MoveDown extends Command{
   ClimbSubsystem mClimbSubsystem;
   DoubleSupplier mSpeedProvider;
-  DigitalInput m_bottomlimitSwitch;
 
   //Initialization
   public MoveDown(ClimbSubsystem mClimbSubsystem, DoubleSupplier mSpeedProvider){
@@ -24,11 +23,8 @@ public class MoveDown extends Command{
   @Override
   public void execute(){
     if(mSpeedProvider.getAsDouble() > 0){
-      if(m_bottomlimitSwitch.get()){
-        mClimbSubsystem.setClimbMotorSetPoint(0);
-      } else {
         mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
-      }
+      
     }
     mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
   }
