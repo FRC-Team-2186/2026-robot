@@ -5,11 +5,9 @@
 package frc.robot;
 
 import java.util.Optional;
-
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -22,7 +20,10 @@ import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.Rebu
  * documentation. If you change the name of this class or the package after creating this project, you must also update
  * the Main.java file in the project.
  */
+
+@SuppressWarnings("unused")
 public class Robot extends LoggedRobot {
+
   private Command m_autonomousCommand;
   private SimulatedArena mSimArena;
 
@@ -31,6 +32,7 @@ public class Robot extends LoggedRobot {
   /**
    * This function is run when the robot is first started up and should be used for any initialization code.
    */
+
   public Robot() {
     // Set up AdvantageKit & friends
     Logger.recordMetadata("ProjectName", "2026-robot");
@@ -43,6 +45,7 @@ public class Robot extends LoggedRobot {
     CommandScheduler.getInstance().onCommandInitialize(CommandsLogging::commandStarted);
     CommandScheduler.getInstance().onCommandFinish(CommandsLogging::commandEnded);
     CommandScheduler.getInstance().onCommandInterrupt(this::commandInterrupted);
+
     // Instantiate our RobotContainer. This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -55,8 +58,10 @@ public class Robot extends LoggedRobot {
    * <p>
    * This runs after the mode specific periodic functions, but before LiveWindow and SmartDashboard integrated updating.
    */
+
   @Override
   public void robotPeriodic() {
+
     // Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods. This must be called from the robot's periodic
