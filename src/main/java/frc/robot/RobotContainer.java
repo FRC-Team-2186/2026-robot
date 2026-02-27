@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.RunFlywheel;
+import frc.robot.commands.TurnToAprilTag;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -44,6 +45,8 @@ public class RobotContainer {
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
   // private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
 
+  private final Vision mVision = new Vision(mSwerveDrive::updateOdometryFromVision);
+
   SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
       mSwerveDrive.getSwerveDrive(), //
       () -> mDriverController.getLeftY() * -1, //
@@ -61,6 +64,10 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
+  }
+
+  public Vision getVision() {
+    return mVision;
   }
 
   /**
@@ -98,6 +105,8 @@ public class RobotContainer {
     // Controlling the Pivot Point for Intake
     mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
     mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));
+
+    mDriverController.leftBumper().whileTrue(new TurnToAprilTag(mSwerveDrive, mVision, 26));
   }
 
   /**

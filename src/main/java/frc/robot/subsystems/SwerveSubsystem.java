@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -13,12 +16,17 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Radians;
+
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -32,15 +40,13 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 @SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
 
-  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(13.5);
-
   private final SwerveDrive mSwerveDrive;
 
   public SwerveSubsystem(File pConfigDir) {
-    boolean isBlueAlliance = DriverStation.getAlliance().map(it -> it == DriverStation.Alliance.Blue).orElse(false);
+    boolean isBlueAlliance = !isRedAlliance();
     Pose2d startingPose = isBlueAlliance
-        ? new Pose2d(new Translation2d(Meter.of(1), Meter.of(4)), Rotation2d.fromDegrees(0))
-        : new Pose2d(new Translation2d(Meter.of(16), Meter.of(4)), Rotation2d.fromDegrees(180));
+        ? new Pose2d(new Translation2d(Meter.of(2.75), Meter.of(4)), Rotation2d.fromDegrees(180))
+        : new Pose2d(new Translation2d(Meter.of(14.25), Meter.of(4)), Rotation2d.fromDegrees(0));
 
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -155,12 +161,26 @@ public class SwerveSubsystem extends SubsystemBase {
     return mSwerveDrive.getSwerveController();
   }
 
+  public void updateOdometryFromVision(Pose2d pVisionMeasurement, double pTimestampSeconds, Matrix<N3, N1> pStdDevs) {
+    mSwerveDrive.swerveDrivePoseEstimator.addVisionMeasurement(pVisionMeasurement, pTimestampSeconds, pStdDevs);
+  }
+
   public ChassisSpeeds convertOperatorInputToChassisSpeeds(double pTranslationX, double pTranslationY, double pRotateX,
       double pRotateY) {
     var scaled = SwerveMath.cubeTranslation(new Translation2d(pTranslationX, pTranslationY));
 
     return getSwerveController().getTargetSpeeds(scaled.getX(), scaled.getY(), pRotateX, pRotateY,
-        getHeading().getRadians(), MAX_SPEED.in(MetersPerSecond));
+        getHeading().getRadians(), Constants.DRIVE_MAX_SPEED.in(MetersPerSecond));
+  }
+
+  public void driveRobotOrientedDirect(double pTranslationX, double pTranslationY, double pRotation) {
+    var translation = new Translation2d(pTranslationX, pTranslationY)
+        .times(getSwerveDrive().getMaximumChassisVelocity());
+    var scaled = SwerveMath.scaleTranslation(translation, 0.8);
+
+    var rotation = pRotation * getSwerveDrive().getMaximumChassisAngularVelocity();
+
+    mSwerveDrive.drive(scaled, rotation, true, false);
   }
 
   public Command driveRobotOrientedCommand(DoubleSupplier pTranslationX, DoubleSupplier pTranslationY,
@@ -184,5 +204,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveFieldOriented(ChassisSpeeds velocity) {
     mSwerveDrive.driveFieldOriented(velocity);
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Estimated Pose", getPose());
   }
 }

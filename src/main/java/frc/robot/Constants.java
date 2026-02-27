@@ -61,6 +61,8 @@ public final class Constants {
   public static final int PivotIntakeCanID = 26;
   // public static final int PivotIntakeFollowerCanID = 11;
 
+  public static final double AIM_SERVO_PID_P = 0.001;
+
   public static final int ClimbMotorCanID = 0;
 
   public static final double fuelIntakeSpeed = 0.5;
