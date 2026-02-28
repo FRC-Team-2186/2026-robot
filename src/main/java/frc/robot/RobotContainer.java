@@ -118,11 +118,11 @@ public class RobotContainer {
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
 
-    mOperatorController.rightBumper().whileTrue(new MoveUp(mClimbSubsystem,0.5)); 
-    mOperatorController.leftBumper().whileTrue(new MoveDown(mClimbSubsystem,-0.5)); 
+    //mOperatorController.rightBumper().whileTrue(new MoveUp(mClimbSubsystem,0.5)); 
+    //mOperatorController.leftBumper().whileTrue(new MoveDown(mClimbSubsystem,-0.5)); 
     // Controlling the Pivot Point for Intake
-    //mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
-    //mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));
+    mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
+    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));
   }
 
   /**

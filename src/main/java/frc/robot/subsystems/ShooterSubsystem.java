@@ -170,7 +170,11 @@ public class ShooterSubsystem extends SubsystemBase {
   public void runFeeder(int pos){
     System.out.println(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity());
     System.out.println((rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity() <= 50) & (rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity() >= 50));
+
+    
     if (Math.abs(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 50){
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    } else if ((pos == 3) && (Math.abs(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 100)){
       setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
     } else {
       setFeederMotorVoltage(0);
