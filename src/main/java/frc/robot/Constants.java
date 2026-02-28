@@ -52,21 +52,21 @@ public final class Constants {
    * 
    * public static final double kFF = 12.0 / kMaxRpm_Motor;
    */
-
+  public static final int pos = 2;
   public static final double kLowRpm = 2000.0;
   public static final double kMidRpm = 3250.0;
   public static final double kHighRpm = 5700.0;
 
   public static final int FuelIntakeCanID = 24;
-  public static final int PivotIntakeCanID = 26;
-  // public static final int PivotIntakeFollowerCanID = 11;
+  public static final int PivotIntakeCanID = 22;
+  public static final int PivotIntakeFollowerCanID = 11;
 
-  public static final int ClimbMotorCanID = 0;
+  public static final int ClimbMotorCanID = 60;
 
   public static final double fuelIntakeSpeed = 0.5;
   public static final double fuelIntakeSpeedReverse = -0.5;
-  public static final double PivotIntakeSpeed = 1;
-  public static final double PivotIntakeSpeedReverse = -1;
+  public static final double PivotIntakeSpeed = .025;
+  public static final double PivotIntakeSpeedReverse = -.05;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;

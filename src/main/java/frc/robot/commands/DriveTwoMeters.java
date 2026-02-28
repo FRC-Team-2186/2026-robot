@@ -14,12 +14,12 @@ public class DriveTwoMeters extends Command{
 
   public DriveTwoMeters(SwerveSubsystem pSwerveSubsystem){
     mSwerveSubsystem = pSwerveSubsystem;
-    initial = new Timer();
     addRequirements(mSwerveSubsystem);
   }
 
   @Override
   public void initialize(){
+    initial = new Timer();
     initial.start();
     mSwerveSubsystem.zeroGyro();
     System.out.println(initial);
@@ -27,18 +27,19 @@ public class DriveTwoMeters extends Command{
 
   @Override
   public void execute(){
-    mSwerveSubsystem.getSwerveDrive().drive(new ChassisSpeeds(1, 0, 0));
+    mSwerveSubsystem.driveRobotOriented(new ChassisSpeeds(1, 0, 0));
   }
 
   @Override
   public void end(boolean interrupted) {
-    mSwerveSubsystem.getSwerveDrive().driveFieldOriented(new ChassisSpeeds(0,0,0));
+    mSwerveSubsystem.driveRobotOriented(new ChassisSpeeds(0,0,0));
   }
 
   @Override
   public boolean isFinished(){
 
-    if (initial.get() > 1){
+    if (initial.get() > 1.0){
+      System.out.println("Finishing Auto");
       return true;
     }
     return false;

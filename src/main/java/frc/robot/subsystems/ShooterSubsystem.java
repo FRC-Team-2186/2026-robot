@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import java.lang.Math;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -38,6 +38,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 @SuppressWarnings("unused")
 public class ShooterSubsystem extends SubsystemBase {
+
+  //public double[] rpm_chart = {0,1649.75,2760.1,3910.5};
+  public double[] rpm_chart = {0,1649.75,3910.5,6350.5};
+  
+  //public double[] voltage_chart = {0,3,5,7};
+  public double[] voltage_chart = {0,3,7,12};
+  
+  public double[] distance_chart =  {0,0,0,0};
 
   public enum SetPointMode {
     RPM, VOLTAGE
@@ -105,15 +113,20 @@ public class ShooterSubsystem extends SubsystemBase {
 
     SparkMaxConfig leaderShooterMotorconfig = new SparkMaxConfig();
     SparkMaxConfig followerShooterMotorconfig = new SparkMaxConfig();
+    SparkMaxConfig feederMotorConfig = new SparkMaxConfig();
 
     leaderShooterMotorconfig.idleMode(IdleMode.kCoast);
+    leaderShooterMotorconfig.inverted(true);
     followerShooterMotorconfig.idleMode(IdleMode.kCoast).follow(mLeaderShooterMotor, true);
+    feederMotorConfig.idleMode(IdleMode.kBrake);
+    feederMotorConfig.inverted(true);
 
     mLeaderShooterMotor.configure(leaderShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
     mFollowerShooterMotor.configure(followerShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
-
+    mFeederShooterMotor.configure(feederMotorConfig, ResetMode.kNoResetSafeParameters,
+        PersistMode.kNoPersistParameters);
   }
 
   public double getFlywheelMotorVoltage() {
@@ -152,6 +165,17 @@ public class ShooterSubsystem extends SubsystemBase {
    */
   public Command sysIdDynamic(SysIdRoutine.Direction direction) {
     return mSysId.dynamic(direction);
+  }
+
+  public void runFeeder(int pos){
+    System.out.println(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity());
+    System.out.println((rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity() <= 50) & (rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity() >= 50));
+    if (Math.abs(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 50){
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    } else {
+      setFeederMotorVoltage(0);
+    }
+
   }
 
   // Shows the voltage of the 3 motors in the dashboard

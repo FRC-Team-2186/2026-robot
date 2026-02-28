@@ -4,40 +4,33 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Constants;
-
+import edu.wpi.first.wpilibj.Timer;
 @SuppressWarnings("unused")
-public class RunFlywheel extends Command {
+
+public class ShootAuto extends Command {
 
   ShooterSubsystem mShooter;
   double mSpeed;
-
+  Timer initial;
   // Initialization
-  public RunFlywheel(ShooterSubsystem pShooter, double pSpeed) {
+  public ShootAuto(ShooterSubsystem pShooter) {
     mShooter = pShooter;
-    mSpeed = pSpeed;
-
+    mSpeed = 7;
     addRequirements(mShooter);
   }
 
   @Override
   public void initialize() {
+    initial = new Timer();
+    initial.start();
+    System.out.println(initial);
   }
 
   // Starts both motors at the given speed
   @Override
   public void execute() {
     mShooter.setFlywheelMotorVoltage(mSpeed);
-    System.out.println(mSpeed);
-    int pos = 0;
-    if (mSpeed == 3.0){
-      pos = 1;
-    } else if (mSpeed == 7.0){
-      pos = 2;
-    } else if (mSpeed == 12.0){
-      pos = 3;
-    }
-    System.out.println(pos);
-    mShooter.runFeeder(pos);
+    mShooter.runFeeder(Constants.pos);
   }
 
   // Stops both motors when the button is let go of
@@ -45,5 +38,15 @@ public class RunFlywheel extends Command {
   public void end(boolean interrupted) {
     mShooter.setFeederMotorVoltage(0);
     mShooter.setFlywheelMotorVoltage(0);
+  }
+
+  @Override
+  public boolean isFinished(){
+
+    if (initial.get() > 5.0){
+      System.out.println("Finishing Auto");
+      return true;
+    }
+    return false;
   }
 }

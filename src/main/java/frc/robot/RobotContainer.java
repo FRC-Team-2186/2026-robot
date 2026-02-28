@@ -8,22 +8,31 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.Configs.ShooterSubsystems;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.commands.DriveTwoMeters;
 import frc.robot.commands.FeederCommand;
+import frc.robot.commands.ShootAuto;
 import frc.robot.subsystems.SwerveSubsystem;
 import swervelib.SwerveDrive;
 import frc.robot.commands.IntakeFuel;
 import frc.robot.commands.IntakePivot;
 import swervelib.SwerveInputStream;
 import java.io.File;
+
+import com.pathplanner.lib.auto.AutoBuilder;
+
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.RunFlywheel;
+import frc.robot.commands.MoveUp;
+import frc.robot.commands.MoveDown;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -42,7 +51,15 @@ public class RobotContainer {
   private final ShooterSubsystem mShooterSubsystem = new ShooterSubsystem();
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
-  // private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
+  private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
+    // A simple auto routine that drives forward a specified distance, and then stops.
+  private final Command m_simpleAuto =
+      new DriveTwoMeters(mSwerveDrive);
+  // A complex auto routine that drives forward, drops a hatch, and then drives backward.
+  private final Command m_complexAuto = new ShootAuto(mShooterSubsystem);
+
+  // A chooser for autonomous commands
+  SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
       mSwerveDrive.getSwerveDrive(), //
@@ -59,6 +76,10 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
+    m_chooser.addOption("Complex Auto", m_complexAuto);
+
+    SmartDashboard.putData("Autonomus", m_chooser);
     // Configure the trigger bindings
     configureBindings();
   }
@@ -72,6 +93,7 @@ public class RobotContainer {
    */
 
   private void configureBindings() {
+    
     // Moving the robot
     var defaultDriveCommand = mSwerveDrive.driveFieldOrientedCommand(mDriveFieldOriented);
 
@@ -83,21 +105,24 @@ public class RobotContainer {
     mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
 
     // Controlling the shooter
-    // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
-    // mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 5));
-    // mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
-    mOperatorController.a().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kForward));
-    mOperatorController.b().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kReverse));
-    mOperatorController.x().whileTrue(mShooterSubsystem.sysIdDynamic(Direction.kForward));
-    mOperatorController.y().whileTrue(mShooterSubsystem.sysIdDynamic(Direction.kReverse));
+    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
+    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
+    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 12));
+
+    // mOperatorController.a().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kForward));
+    // mOperatorController.b().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kReverse));
+    // mOperatorController.x().whileTrue(mShooterSubsystem.sysIdDynamic(Direction.kForward));
+    // mOperatorController.y().whileTrue(mShooterSubsystem.sysIdDynamic(Direction.kReverse));
 
     // Controlling the Paddles for Intake
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
 
+    mOperatorController.rightBumper().whileTrue(new MoveUp(mClimbSubsystem,0.5)); 
+    mOperatorController.leftBumper().whileTrue(new MoveDown(mClimbSubsystem,-0.5)); 
     // Controlling the Pivot Point for Intake
-    mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
-    mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));
+    //mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
+    //mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));
   }
 
   /**
@@ -107,11 +132,12 @@ public class RobotContainer {
    */
 
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Commands.none();
+    return m_chooser.getSelected();
   }
 
   public SwerveSubsystem getSwerveSubsystem() {
     return mSwerveDrive;
   }
+
 }
+

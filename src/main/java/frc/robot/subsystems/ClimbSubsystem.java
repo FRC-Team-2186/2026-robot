@@ -18,7 +18,7 @@ public class ClimbSubsystem extends SubsystemBase {
   }
 
   public void setClimbMotorSetPoint(double newClimbMotorSetPoint) {
-    mClimbMotor.setVoltage(newClimbMotorSetPoint);
+    mClimbMotor.set(newClimbMotorSetPoint);
   }
 
   // Showing the voltage of the climbing motor on the Dashboard
