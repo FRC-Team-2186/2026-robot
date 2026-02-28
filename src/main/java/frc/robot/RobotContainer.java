@@ -53,10 +53,12 @@ public class RobotContainer {
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
   private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
     // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_simpleAuto =
+  private final Command m_drive2meters =
       new DriveTwoMeters(mSwerveDrive);
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
-  private final Command m_complexAuto = new ShootAuto(mShooterSubsystem);
+  private final Command m_shootFuel = new ShootAuto(mShooterSubsystem);
+
+  private final Command m_shootFuelThenDrive = new ShootAuto(mShooterSubsystem).andThen(new DriveTwoMeters(mSwerveDrive));
 
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
@@ -76,8 +78,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    m_chooser.setDefaultOption("Simple Auto", m_simpleAuto);
-    m_chooser.addOption("Complex Auto", m_complexAuto);
+    m_chooser.setDefaultOption("Drive 2 Meters Auto", m_drive2meters);
+    m_chooser.addOption("Shoot Fuel Auto", m_shootFuel);
+    m_chooser.addOption("Shoot then Drive Auto", m_shootFuelThenDrive);
 
     SmartDashboard.putData("Autonomus", m_chooser);
     // Configure the trigger bindings
