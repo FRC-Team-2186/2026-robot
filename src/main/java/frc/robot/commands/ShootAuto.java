@@ -30,7 +30,7 @@ public class ShootAuto extends Command {
   @Override
   public void execute() {
     mShooter.setFlywheelMotorVoltage(mSpeed);
-    mShooter.runFeeder(Constants.pos);
+    mShooter.runFeeder(Constants.ShooterSubsystemConstants.kMidShotIndex);
   }
 
   // Stops both motors when the button is let go of

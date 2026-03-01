@@ -108,9 +108,12 @@ public class RobotContainer {
     mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
 
     // Controlling the shooter
-    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
-    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
-    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 12));
+    mOperatorController.x()
+        .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kNearShotIndex));
+    mOperatorController.y()
+        .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kMidShotIndex));
+    mOperatorController.b()
+        .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kFarShotIndex));
 
     // mOperatorController.a().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kForward));
     // mOperatorController.b().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kReverse));
@@ -143,4 +146,3 @@ public class RobotContainer {
   }
 
 }
-

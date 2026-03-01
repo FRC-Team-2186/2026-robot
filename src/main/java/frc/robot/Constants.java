@@ -52,7 +52,6 @@ public final class Constants {
    * 
    * public static final double kFF = 12.0 / kMaxRpm_Motor;
    */
-  public static final int pos = 2;
   public static final double kLowRpm = 2000.0;
   public static final double kMidRpm = 3250.0;
   public static final double kHighRpm = 5700.0;
@@ -76,6 +75,8 @@ public final class Constants {
   public static final class ShooterSubsystemConstants {
     public static final double FeederSpeed = 6;
     public static final int kFarShotIndex = 3;
+    public static final int kNearShotIndex = 1;
+    public static final int kMidShotIndex = 2;
     public static final double kFeederToleranceRpm = 50.0;
     public static final double kFeederToleranceRpmFar = 100.0;
     public static final double kFeederLogPeriodSec = 0.25;
