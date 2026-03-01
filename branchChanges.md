@@ -1,7 +1,13 @@
 # Branch Changes and Improvements
+This document summarizes the changes and improvements made in the `Dave_Reviews` branch.
+
+## Guiding Idea
+We centered the shooter workflow around a single preset index (`pos`) as the primary selector for distance, voltage, and RPM.
+Using one primary selector keeps the tables aligned, avoids fragile conversions, and makes future vision/PIDF upgrades fit cleanly.
 
 ## Files Changed in This Branch
 - README.md
+- branchChanges.md
 - driverGuide.md
 - src/main/java/frc/robot/Constants.java
 - src/main/java/frc/robot/Robot.java
@@ -13,16 +19,12 @@
 - src/main/java/frc/robot/commands/RunFlywheel.java
 - src/main/java/frc/robot/commands/ShootAuto.java
 - src/main/java/frc/robot/commands/ShootByDistance.java
+- src/main/java/frc/robot/commands/ShooterVoltageTest.java
 - src/main/java/frc/robot/subsystems/ClimbSubsystem.java
 - src/main/java/frc/robot/subsystems/IntakeSubsystem.java
 - src/main/java/frc/robot/subsystems/ShooterSubsystem.java
 - src/main/java/frc/robot/subsystems/SwerveSubsystem.java
-
-This document summarizes the changes and improvements made in the `Dave_Reviews` branch.
-
-## Guiding Idea
-We centered the shooter workflow around a single preset index (`pos`) as the primary selector for distance, voltage, and RPM.
-Using one primary selector keeps the tables aligned, avoids fragile conversions, and makes future vision/PIDF upgrades fit cleanly.
+- testPlan.md
 
 ## Shooter Architecture and Presets
 - Standardized shooter presets around a single `pos` index shared by distance, voltage, and RPM tables.
@@ -52,12 +54,18 @@ Using one primary selector keeps the tables aligned, avoids fragile conversions,
   - Shooter motors stopped until a valid target returns.
 - Added a commented-out binding in `RobotContainer` (TODO for vision wiring).
 
+## New Command: ShooterVoltageTest
+- Added `ShooterVoltageTest` to allow live voltage tuning via Shuffleboard.
+- Operator Start button runs the test and reads `Shooter/TestVoltage`.
+- Feeder gating still uses the selected preset index for consistency.
+
 ## Hardware Alignment
 - Updated shooter motor/controller usage to `SparkFlex` and `SparkFlexConfig` to match Vortex hardware.
 
 ## Documentation
 - Added `driverGuide.md` with:
   - Driver/Operator bindings and USB indices.
+  - Shooter test binding (Operator Start) and dashboard entry.
   - Preset meanings and usage notes.
   - Vision usage and readiness cues.
   - Autonomous chooser descriptions.
