@@ -114,6 +114,8 @@ public class RobotContainer {
         .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kMidShotIndex));
     mOperatorController.b()
         .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kFarShotIndex));
+    // TODO: Wire up vision distance and enable this binding.
+    // mOperatorController.rightStick().whileTrue(new ShootByDistance(mShooterSubsystem, mOperatorController));
 
     // mOperatorController.a().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kForward));
     // mOperatorController.b().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kReverse));

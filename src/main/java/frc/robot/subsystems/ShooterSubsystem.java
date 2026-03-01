@@ -163,6 +163,20 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   /**
+   * Returns the current vision-estimated distance to the target (meters).
+   *
+   * Intent:
+   * - Placeholder for future vision integration.
+   * - ShootByDistance uses this distance to select a preset.
+   *
+   * Contract:
+   * - Return Double.NaN when no valid target/distance is available.
+   */
+  public double getVisionDistanceMeters() {
+    return Double.NaN;
+  }
+
+  /**
    * Returns the flywheel voltage for a preset index.
    *
    * Intent:
