@@ -75,6 +75,10 @@ public final class Constants {
 
   public static final class ShooterSubsystemConstants {
     public static final double FeederSpeed = 6;
+    public static final int kFarShotIndex = 3;
+    public static final double kFeederToleranceRpm = 50.0;
+    public static final double kFeederToleranceRpmFar = 100.0;
+    public static final double kFeederLogPeriodSec = 0.25;
 
     public static final int kFeederMotorCanId = 28; // SPARK Flex CAN ID
     public static final int kFlywheelMotorCanId = 27; // SPARK Flex CAN ID (Right)

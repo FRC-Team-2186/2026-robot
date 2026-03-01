@@ -28,6 +28,7 @@ import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -82,6 +83,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private SetPointMode lastSetpointMode = SetPointMode.RPM;
   private double lastLoggedTargetRpm = Double.NaN;
   private double lastLoggedTargetVoltage = Double.NaN;
+  private double lastFeederLogTimestamp = Double.NEGATIVE_INFINITY;
 
   private static final double[] DISTANCE_TABLE_METERS = { Constants.kLowDistanceMeters, Constants.kMidDistanceMeters,
       Constants.kHighDistanceMeters };
@@ -101,9 +103,20 @@ public class ShooterSubsystem extends SubsystemBase {
   private final SysIdRoutine mSysId = new SysIdRoutine(new SysIdRoutine.Config(),
       new SysIdRoutine.Mechanism(mLeaderShooterMotor::setVoltage, this::handleSysIdLog, this));
 
-  // Setting the motors to their current settings and overwriting previous configs.
+  /**
+   * Sets up the shooter subsystem hardware and dashboard views.
+   *
+   * Responsibilities:
+   * - Set up Shuffleboard entries for RPM visualization.
+   * - Configure motor controllers (idle mode, inversion, following).
+   * - Apply configs once at startup (no reset, no persistence).
+   *
+   * Intent:
+   * - Keep all hardware configuration centralized here.
+   * - Make startup state explicit and easy to audit.
+   */
   public ShooterSubsystem() {
-
+    // Initialize Shuffleboard widgets for live RPM graphs.
     leaderRpmEntry = Shuffleboard.getTab("Shooter").add("Shooter Leader RPM", 0.0).withWidget(BuiltInWidgets.kGraph)
         .getEntry();
     followerRpmEntry = Shuffleboard.getTab("Shooter").add("Shooter Follower RPM", 0.0).withWidget(BuiltInWidgets.kGraph)
@@ -111,16 +124,19 @@ public class ShooterSubsystem extends SubsystemBase {
 
     System.out.println("Working Shooter");
 
+    // Create local configs to stage settings before applying to hardware.
     SparkMaxConfig leaderShooterMotorconfig = new SparkMaxConfig();
     SparkMaxConfig followerShooterMotorconfig = new SparkMaxConfig();
     SparkMaxConfig feederMotorConfig = new SparkMaxConfig();
 
+    // Shooter flywheels should coast; feeder should brake to hold position.
     leaderShooterMotorconfig.idleMode(IdleMode.kCoast);
     leaderShooterMotorconfig.inverted(true);
     followerShooterMotorconfig.idleMode(IdleMode.kCoast).follow(mLeaderShooterMotor, true);
     feederMotorConfig.idleMode(IdleMode.kBrake);
     feederMotorConfig.inverted(true);
 
+    // Apply configs without resetting or persisting parameters.
     mLeaderShooterMotor.configure(leaderShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
     mFollowerShooterMotor.configure(followerShooterMotorconfig, ResetMode.kNoResetSafeParameters,
@@ -167,20 +183,59 @@ public class ShooterSubsystem extends SubsystemBase {
     return mSysId.dynamic(direction);
   }
 
-  public void runFeeder(int pos){
-    System.out.println(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity());
-    System.out.println((rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity() <= 50) & (rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity() >= 50));
+  /**
+   * Controls the feeder motor based on how close the flywheel RPM is to
+   * target.
+   *
+   * Intent:
+   * - Prevent feeding until the flywheel is at speed.
+   * - Allow a looser tolerance for the farthest shot index.
+   * - Rate-limit debug output to avoid console spam.
+   *
+   * Params:
+   * - pos: index into rpm_chart[] that selects the target RPM.
+   */
+  public void runFeeder(int pos) {
+    // TODO: Remove or downgrade to an assert for production (throws in
+    // match if pos is invalid).
+    if (pos < 0 || pos >= rpm_chart.length) {
+      throw new IllegalArgumentException("pos out of range: " + pos);
+    }
+    //assert (pos >= 0) && (pos < rpm_chart.length) : "pos out of range: " + pos;
 
-    
-    if (Math.abs(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 50){
-      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
-    } else if ((pos == 3) && (Math.abs(rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 100)){
-      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    // Read the current flywheel RPM from the leader motor’s encoder.
+    double currentRpm =
+        mLeaderShooterMotor.getEncoder().getVelocity();
+
+    // Look up the target RPM for this position.
+    double targetRpm = rpm_chart[pos];
+
+    // Compute signed error: positive means below target, negative above.
+    double error = targetRpm - currentRpm;
+
+    // Use a looser tolerance for the farthest shot index.
+    double tolerance =
+        (pos == Constants.ShooterSubsystemConstants.kFarShotIndex)
+            ? Constants.ShooterSubsystemConstants.kFeederToleranceRpmFar
+            : Constants.ShooterSubsystemConstants.kFeederToleranceRpm;
+
+    // Rate-limit debug output to avoid flooding the console.
+    double now = Timer.getFPGATimestamp();
+    if (now - lastFeederLogTimestamp
+        >= Constants.ShooterSubsystemConstants.kFeederLogPeriodSec) {
+      System.out.println("Shooter RPM error: " + error);
+      lastFeederLogTimestamp = now;
+    }
+
+    // Only run the feeder once within tolerance.
+    if (Math.abs(error) <= tolerance) {
+      setFeederMotorVoltage(
+          Constants.ShooterSubsystemConstants.FeederSpeed);
     } else {
       setFeederMotorVoltage(0);
     }
-
   }
+
 
   // Shows the voltage of the 3 motors in the dashboard
   @Override

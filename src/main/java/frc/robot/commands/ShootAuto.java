@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.ShooterSubsystem;
-import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Timer;
 @SuppressWarnings("unused")
@@ -14,7 +13,7 @@ public class ShootAuto extends Command {
   double mSpeed;
   Timer initial;
   // Initialization
-  public ShootAuto(ShooterSubsystem pShooter, IntakeSubsystem mIntake) {
+  public ShootAuto(ShooterSubsystem pShooter) {
     mShooter = pShooter;
     mSpeed = 7;
     addRequirements(mShooter);
