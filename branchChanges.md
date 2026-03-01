@@ -5,25 +5,16 @@ This document summarizes the changes and improvements made in the `Dave_Reviews`
 We centered the shooter workflow around a single preset index (`pos`) as the primary selector for distance, voltage, and RPM.
 Using one primary selector keeps the tables aligned, avoids fragile conversions, and makes future vision/PIDF upgrades fit cleanly.
 
-## Files Changed in This Branch
-- README.md
+## Files Changed in This Branch (base: `autonomus`)
 - branchChanges.md
 - driverGuide.md
 - src/main/java/frc/robot/Constants.java
-- src/main/java/frc/robot/Robot.java
 - src/main/java/frc/robot/RobotContainer.java
-- src/main/java/frc/robot/commands/DriveTwoMeters.java
-- src/main/java/frc/robot/commands/IntakeFuel.java
-- src/main/java/frc/robot/commands/MoveDown.java
-- src/main/java/frc/robot/commands/MoveUp.java
 - src/main/java/frc/robot/commands/RunFlywheel.java
 - src/main/java/frc/robot/commands/ShootAuto.java
 - src/main/java/frc/robot/commands/ShootByDistance.java
 - src/main/java/frc/robot/commands/ShooterVoltageTest.java
-- src/main/java/frc/robot/subsystems/ClimbSubsystem.java
-- src/main/java/frc/robot/subsystems/IntakeSubsystem.java
 - src/main/java/frc/robot/subsystems/ShooterSubsystem.java
-- src/main/java/frc/robot/subsystems/SwerveSubsystem.java
 - testPlan.md
 
 ## Shooter Architecture and Presets
