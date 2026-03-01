@@ -16,6 +16,7 @@
 - Right Trigger: Intake fuel (forward)
 - Left Bumper: Intake pivot (reverse)
 - Right Bumper: Intake pivot (forward)
+- Start: Shooter voltage test (reads `Shooter/TestVoltage` from dashboard)
 
 ## Preset Meanings
 - Near/Mid/Far are preset shot indices. These should map to increasing distance.

@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.RunFlywheel;
 import frc.robot.commands.MoveUp;
 import frc.robot.commands.MoveDown;
+import frc.robot.commands.ShooterVoltageTest;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -114,6 +115,9 @@ public class RobotContainer {
         .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kMidShotIndex));
     mOperatorController.b()
         .whileTrue(new RunFlywheel(mShooterSubsystem, Constants.ShooterSubsystemConstants.kFarShotIndex));
+    // Temporary test binding for voltage tuning via dashboard entry.
+    mOperatorController.start().whileTrue(
+        new ShooterVoltageTest(mShooterSubsystem, Constants.ShooterSubsystemConstants.kMidShotIndex));
     // TODO: Wire up vision distance and enable this binding.
     // mOperatorController.rightStick().whileTrue(new ShootByDistance(mShooterSubsystem, mOperatorController));
 
