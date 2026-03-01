@@ -3,6 +3,8 @@
 ## Driver Controller (Xbox)
 - Driver Station USB index: 0
 - A: Zero gyro
+- Left Stick: Drive translation (forward/back, strafe)
+- Right Stick: Drive rotation (turn)
 
 ## Operator Controller (Xbox)
 - Driver Station USB index: 1
