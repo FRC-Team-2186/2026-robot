@@ -7,10 +7,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class MoveUp extends Command {
   ClimbSubsystem mClimbSubsystem;
-  DoubleSupplier mSpeedProvider;
+  double mSpeedProvider;
 
   // Initialization
-  public MoveUp(ClimbSubsystem pClimbSubsystem, DoubleSupplier pSpeedProvider) {
+  public MoveUp(ClimbSubsystem pClimbSubsystem, double pSpeedProvider) {
     mClimbSubsystem = pClimbSubsystem;
     mSpeedProvider = pSpeedProvider;
     addRequirements(mClimbSubsystem);
@@ -23,8 +23,7 @@ public class MoveUp extends Command {
   // Turning on the motor to lower the hook
   @Override
   public void execute() {
-    double requestedSpeed = mSpeedProvider.getAsDouble();
-    mClimbSubsystem.setClimbMotorSetPoint(requestedSpeed);
+    mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider);
   }
 
   // Stopping when button press is over

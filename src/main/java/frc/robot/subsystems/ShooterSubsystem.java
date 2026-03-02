@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-
+import java.lang.Math;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Volts;
@@ -38,7 +38,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 @SuppressWarnings("unused")
 public class ShooterSubsystem extends SubsystemBase {
-
+ 
   public enum SetPointMode {
     RPM, VOLTAGE
   }
@@ -75,14 +75,6 @@ public class ShooterSubsystem extends SubsystemBase {
   private double lastLoggedTargetRpm = Double.NaN;
   private double lastLoggedTargetVoltage = Double.NaN;
 
-  private static final double[] DISTANCE_TABLE_METERS = { Constants.kLowDistanceMeters, Constants.kMidDistanceMeters,
-      Constants.kHighDistanceMeters };
-
-  private static final double[] RPM_TABLE = { Constants.kLowRpm, Constants.kMidRpm, Constants.kHighRpm };
-
-  private static final double[] VOLTAGE_TABLE = { Constants.kLowVoltage, Constants.kMidVoltage,
-      Constants.kHighVoltage };
-
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
@@ -101,19 +93,24 @@ public class ShooterSubsystem extends SubsystemBase {
     followerRpmEntry = Shuffleboard.getTab("Shooter").add("Shooter Follower RPM", 0.0).withWidget(BuiltInWidgets.kGraph)
         .getEntry();
 
-    System.out.println("Working Shooter");
+    //System.out.println("Working Shooter");
 
     SparkMaxConfig leaderShooterMotorconfig = new SparkMaxConfig();
     SparkMaxConfig followerShooterMotorconfig = new SparkMaxConfig();
+    SparkMaxConfig feederMotorConfig = new SparkMaxConfig();
 
-    leaderShooterMotorconfig.idleMode(IdleMode.kCoast);
-    followerShooterMotorconfig.idleMode(IdleMode.kCoast).follow(mLeaderShooterMotor, true);
+    leaderShooterMotorconfig.idleMode(IdleMode.kBrake);
+    leaderShooterMotorconfig.inverted(true);
+    followerShooterMotorconfig.idleMode(IdleMode.kBrake).follow(mLeaderShooterMotor, true);
+    feederMotorConfig.idleMode(IdleMode.kBrake);
+    feederMotorConfig.inverted(true);
 
     mLeaderShooterMotor.configure(leaderShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
     mFollowerShooterMotor.configure(followerShooterMotorconfig, ResetMode.kNoResetSafeParameters,
         PersistMode.kNoPersistParameters);
-
+    mFeederShooterMotor.configure(feederMotorConfig, ResetMode.kNoResetSafeParameters,
+        PersistMode.kNoPersistParameters);
   }
 
   public double getFlywheelMotorVoltage() {
@@ -154,14 +151,29 @@ public class ShooterSubsystem extends SubsystemBase {
     return mSysId.dynamic(direction);
   }
 
+  public void runFeeder(int pos){
+    //System.out.println("Third Thingy");
+    //System.out.println((Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 150));
+
+    
+    if (Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 25){
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    } else if ((pos == 3) && (Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 100)){
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    } else {
+      setFeederMotorVoltage(0);
+    }
+
+  }
+
   // Shows the voltage of the 3 motors in the dashboard
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Flywheel (Leader) Applied Voltage",
-        mLeaderShooterMotor.getAppliedOutput() * mLeaderShooterMotor.getBusVoltage());
-    SmartDashboard.putNumber("Flywheel (Follower)",
-        mFollowerShooterMotor.getAppliedOutput() * mFollowerShooterMotor.getBusVoltage());
-    SmartDashboard.putNumber("Flywheel RPM", mLeaderShooterMotor.getEncoder().getVelocity());
-    SmartDashboard.putNumber("Feeder", mFeederShooterMotor.getBusVoltage());
+    // SmartDashboard.putNumber("Flywheel (Leader) Applied Voltage",
+    //     mLeaderShooterMotor.getAppliedOutput() * mLeaderShooterMotor.getBusVoltage());
+    // SmartDashboard.putNumber("Flywheel (Follower)",
+    //     mFollowerShooterMotor.getAppliedOutput() * mFollowerShooterMotor.getBusVoltage());
+    // SmartDashboard.putNumber("Flywheel RPM", mLeaderShooterMotor.getEncoder().getVelocity());
+    // SmartDashboard.putNumber("Feeder", mFeederShooterMotor.getBusVoltage());
   }
 }

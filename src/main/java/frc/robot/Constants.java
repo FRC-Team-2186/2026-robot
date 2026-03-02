@@ -31,14 +31,6 @@ public final class Constants {
    * Test CAN ID's public static final int FuelIntakeCanID = 10; public static final int PivotIntakeCanID = 22;
    */
 
-  public static final double kLowDistanceMeters = 5.0;
-  public static final double kMidDistanceMeters = 8.0;
-  public static final double kHighDistanceMeters = 10.0;
-
-  public static final double kLowVoltage = 6.0;
-  public static final double kMidVoltage = 8.0;
-  public static final double kHighVoltage = 10.0;
-
   /*
    * public enum MotorTypeProfile { NEO, // Standard NEO brushless motor VORTEX // High-performance NEO Vortex motor }
    * 
@@ -53,20 +45,41 @@ public final class Constants {
    * public static final double kFF = 12.0 / kMaxRpm_Motor;
    */
 
-  public static final double kLowRpm = 2000.0;
-  public static final double kMidRpm = 3250.0;
-  public static final double kHighRpm = 5700.0;
-
   public static final int FuelIntakeCanID = 24;
-  public static final int PivotIntakeCanID = 26;
-  // public static final int PivotIntakeFollowerCanID = 11;
+  public static final int PivotIntakeCanID = 22;
+  public static final int PivotIntakeFollowerCanID = 11;
+  
+  public static final int pos = 0;
 
-  public static final int ClimbMotorCanID = 0;
+  //public double[] rpm_chart = {0,1649.75,2760.1,3910.5};
+  //public double[] rpm_chart = {0,1649.75,3910.5,6350.5};
+  public static final double lowRpm = 2760.1;
+  public static final double mediumRpm = 3331.5;
+  public static final double highRpm = 4190.5;
+  public static final double highestRpm = 4895.5;
+
+  public static double[] rpm_chart = {lowRpm,mediumRpm,highRpm,highestRpm};
+
+  //public double[] voltage_chart = {0,3,5,7};
+  //public double[] voltage_chart = {0,3,7,12};
+  public static final double lowVoltage = 5;
+  public static final double mediumVoltage = 6;
+  public static final double highVoltage = 7.5;
+  public static final double highestVoltage = 8.75;
+  public static double[] voltage_chart = {lowVoltage,mediumVoltage,highVoltage,highestVoltage};
+  
+  //Inches
+  public static double[] distance_chart_inches =  {66,117,135.24,153.5};
+
+  //Feet
+  public static double[] distance_chart_feet = {5.5,9.75,11.27,12.791};
+
+  public static final int ClimbMotorCanID = 60;
 
   public static final double fuelIntakeSpeed = 0.5;
   public static final double fuelIntakeSpeedReverse = -0.5;
-  public static final double PivotIntakeSpeed = 1;
-  public static final double PivotIntakeSpeedReverse = -1;
+  public static final double PivotIntakeSpeed = .025;
+  public static final double PivotIntakeSpeedReverse = -.05;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;
