@@ -7,14 +7,16 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 
 @SuppressWarnings("unused")
-public class DriveTwoMeters extends Command{
+public class rotateRobotAuto extends Command{
 
   SwerveSubsystem mSwerveSubsystem;
   Timer initial;
+  int Direction;
 
-  public DriveTwoMeters(SwerveSubsystem pSwerveSubsystem){
+  public rotateRobotAuto(SwerveSubsystem pSwerveSubsystem, int mDirection){
     mSwerveSubsystem = pSwerveSubsystem;
     addRequirements(mSwerveSubsystem);
+    Direction = mDirection;
   }
 
   @Override
@@ -27,7 +29,7 @@ public class DriveTwoMeters extends Command{
 
   @Override
   public void execute(){
-    mSwerveSubsystem.driveRobotOriented(new ChassisSpeeds(-1, 0, 0));
+    mSwerveSubsystem.driveRobotOriented(new ChassisSpeeds(0, 0, Direction));
   }
 
   @Override

@@ -17,6 +17,7 @@ import frc.robot.commands.IntakeFuel;
 import frc.robot.commands.IntakePivot;
 import swervelib.SwerveInputStream;
 import java.io.File;
+import frc.robot.commands.rotateRobotAuto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 
@@ -56,10 +57,15 @@ public class RobotContainer {
   private final Command m_drive2meters =
       new DriveTwoMeters(mSwerveDrive);
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
-  private final Command m_shootFuel = new ShootAuto(mShooterSubsystem);
+  private final Command m_shootFuel = new ShootAuto(mShooterSubsystem, mIntakeSubsystem);
+  private final Command m_rotateRobotLeft = new rotateRobotAuto(mSwerveDrive,90);
+  private final Command m_rotateRobotRight = new rotateRobotAuto(mSwerveDrive,-90);
 
-  private final Command m_shootFuelThenDrive = new ShootAuto(mShooterSubsystem).andThen(new DriveTwoMeters(mSwerveDrive));
-
+  private final Command m_shootFuelThenDrive = new ShootAuto(mShooterSubsystem,mIntakeSubsystem).andThen(new DriveTwoMeters(mSwerveDrive));
+  private final Command m_driveThenShootFuel = new DriveTwoMeters(mSwerveDrive).andThen(new ShootAuto(mShooterSubsystem, mIntakeSubsystem));
+  private final Command m_driveRotateLeftShoot = new DriveTwoMeters(mSwerveDrive).andThen(new rotateRobotAuto(mSwerveDrive,90)).andThen(new ShootAuto(mShooterSubsystem, mIntakeSubsystem));
+  private final Command m_driveRotateRightShoot = new DriveTwoMeters(mSwerveDrive).andThen(new rotateRobotAuto(mSwerveDrive,-90)).andThen(new ShootAuto(mShooterSubsystem, mIntakeSubsystem));
+  
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
@@ -80,7 +86,11 @@ public class RobotContainer {
   public RobotContainer() {
     m_chooser.setDefaultOption("Drive 2 Meters Auto", m_drive2meters);
     m_chooser.addOption("Shoot Fuel Auto", m_shootFuel);
+    //DONT USE v
     m_chooser.addOption("Shoot then Drive Auto", m_shootFuelThenDrive);
+    m_chooser.addOption("Drive Auto then Shoot", m_driveThenShootFuel);
+    m_chooser.addOption("Drive, Rotate Left, then Shoot", m_driveRotateLeftShoot);
+    m_chooser.addOption("Drive, Rotate Right, then Shoot", m_driveRotateRightShoot);
 
     SmartDashboard.putData("Autonomus", m_chooser);
     // Configure the trigger bindings
@@ -105,12 +115,15 @@ public class RobotContainer {
     mDriverController.a().onTrue(mSwerveDrive.zeroGyroCommand());
 
     // Controlling the Feeder Motor
-    mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
+    //mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
 
+    //Driver and Operator E-Stop for testing
+    
     // Controlling the shooter
-    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, 3));
-    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, 7));
-    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, 12));
+    mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.lowVoltage));
+    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.mediumVoltage));
+    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.highVoltage));
+    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.highestVoltage));
 
     // mOperatorController.a().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kForward));
     // mOperatorController.b().whileTrue(mShooterSubsystem.sysIdQuasistatic(Direction.kReverse));
@@ -121,8 +134,8 @@ public class RobotContainer {
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
 
-    //mOperatorController.rightBumper().whileTrue(new MoveUp(mClimbSubsystem,0.5)); 
-    //mOperatorController.leftBumper().whileTrue(new MoveDown(mClimbSubsystem,-0.5)); 
+    mOperatorController.povUp().whileTrue(new MoveUp(mClimbSubsystem,0.5)); 
+    mOperatorController.povDown().whileTrue(new MoveDown(mClimbSubsystem,-0.5)); 
     // Controlling the Pivot Point for Intake
     mOperatorController.leftBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeedReverse));
     mOperatorController.rightBumper().whileTrue(new IntakePivot(mIntakeSubsystem, Constants.PivotIntakeSpeed));

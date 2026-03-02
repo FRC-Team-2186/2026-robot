@@ -24,6 +24,6 @@ public class ClimbSubsystem extends SubsystemBase {
   // Showing the voltage of the climbing motor on the Dashboard
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Climbing Motor", mClimbMotor.getBusVoltage());
+    //SmartDashboard.putNumber("Climbing Motor", mClimbMotor.getBusVoltage());
   }
 }

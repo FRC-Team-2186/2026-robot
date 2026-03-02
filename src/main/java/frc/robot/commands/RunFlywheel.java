@@ -27,16 +27,18 @@ public class RunFlywheel extends Command {
   @Override
   public void execute() {
     mShooter.setFlywheelMotorVoltage(mSpeed);
-    System.out.println(mSpeed);
+    //System.out.println(mSpeed);
     int pos = 0;
-    if (mSpeed == 3.0){
+    if (mSpeed == Constants.lowVoltage){
+      pos = 0;
+    } else if (mSpeed == Constants.mediumVoltage){
       pos = 1;
-    } else if (mSpeed == 7.0){
+    } else if (mSpeed == Constants.highVoltage){
       pos = 2;
-    } else if (mSpeed == 12.0){
+    } else if (mSpeed == Constants.highestVoltage){
       pos = 3;
     }
-    System.out.println(pos);
+    //System.out.println(pos);
     mShooter.runFeeder(pos);
   }
 

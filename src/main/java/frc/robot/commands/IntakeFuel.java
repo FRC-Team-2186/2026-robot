@@ -34,7 +34,7 @@ public class IntakeFuel extends Command {
   // When button hobuild is over, turn off the motor
   @Override
   public void end(boolean interupted) {
-    System.out.println("end");
+    //System.out.println("end");
     mIntakeSubsystem.setFuelIntakeMotorSetpoint(0);
   }
 }

@@ -49,8 +49,8 @@ public class IntakeSubsystem extends SubsystemBase {
   // Shows the values of pivot and fuel in the Dashboard
   @Override
   public void periodic() {
-    SmartDashboard.putNumber("Fuel Intake Motor", mFuelIntakeMotor.getBusVoltage());
-    SmartDashboard.putNumber("Pivot Intake Motor", mPivotIntakeMotor.getBusVoltage());
+    // SmartDashboard.putNumber("Fuel Intake Motor", mFuelIntakeMotor.getBusVoltage());
+    // SmartDashboard.putNumber("Pivot Intake Motor", mPivotIntakeMotor.getBusVoltage());
     // SmartDashboard.putNumber("Pivot 2 Intake Motor",mPivotIntakeMotorRight.getBusVoltage());
   }
 }
