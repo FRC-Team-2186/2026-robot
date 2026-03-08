@@ -15,10 +15,11 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
+import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.GenericEntry;
@@ -48,11 +49,11 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   // Initializing the 3 motors
-  private final SparkMax mLeaderShooterMotor = new SparkMax(Constants.ShooterSubsystemConstants.kFlywheelMotorCanId,
+  private final SparkFlex mLeaderShooterMotor = new SparkFlex(Constants.ShooterSubsystemConstants.kFlywheelMotorCanId,
       MotorType.kBrushless);
-  private final SparkMax mFollowerShooterMotor = new SparkMax(
+  private final SparkFlex mFollowerShooterMotor = new SparkFlex(
       Constants.ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
-  private final SparkMax mFeederShooterMotor = new SparkMax(Constants.ShooterSubsystemConstants.kFeederMotorCanId,
+  private final SparkFlex mFeederShooterMotor = new SparkFlex(Constants.ShooterSubsystemConstants.kFeederMotorCanId,
       MotorType.kBrushless);
 
   private final RelativeEncoder leaderEncoder = mLeaderShooterMotor.getEncoder();
@@ -74,6 +75,7 @@ public class ShooterSubsystem extends SubsystemBase {
   private SetPointMode lastSetpointMode = SetPointMode.RPM;
   private double lastLoggedTargetRpm = Double.NaN;
   private double lastLoggedTargetVoltage = Double.NaN;
+  private double lastFeederLogTimestamp = Double.NEGATIVE_INFINITY;
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
   private final MutVoltage m_appliedVoltage = Volts.mutable(0);
@@ -84,7 +86,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private final SysIdRoutine mSysId = new SysIdRoutine(new SysIdRoutine.Config(),
       new SysIdRoutine.Mechanism(mLeaderShooterMotor::setVoltage, this::handleSysIdLog, this));
-
+  
   // Setting the motors to their current settings and overwriting previous configs.
   public ShooterSubsystem() {
 
@@ -95,9 +97,9 @@ public class ShooterSubsystem extends SubsystemBase {
 
     //System.out.println("Working Shooter");
 
-    SparkMaxConfig leaderShooterMotorconfig = new SparkMaxConfig();
-    SparkMaxConfig followerShooterMotorconfig = new SparkMaxConfig();
-    SparkMaxConfig feederMotorConfig = new SparkMaxConfig();
+    SparkFlexConfig leaderShooterMotorconfig = new SparkFlexConfig();
+    SparkFlexConfig followerShooterMotorconfig = new SparkFlexConfig();
+    SparkFlexConfig feederMotorConfig = new SparkFlexConfig();
 
     leaderShooterMotorconfig.idleMode(IdleMode.kBrake);
     leaderShooterMotorconfig.inverted(true);
@@ -129,6 +131,147 @@ public class ShooterSubsystem extends SubsystemBase {
     mFeederShooterMotor.setVoltage(feederSubsystemMotorVoltage);
   }
 
+   /**
+   * Returns the current vision-estimated distance to the target (meters).
+   *
+   * Intent:
+   * - Placeholder for future vision integration.
+   * - ShootByDistance uses this distance to select a preset.
+   *
+   * Contract:
+   * - Return Double.NaN when no valid target/distance is available.
+   */
+
+  public double getVisionDistanceMeters() {
+    return Double.NaN;
+  }
+
+  /**
+   * Returns the flywheel voltage for a preset index.
+   *
+   * Intent:
+   * - Single source of truth for voltage lookup by preset.
+   * - Keeps open-loop voltage control aligned with distance/RPM tables.
+   */
+  public double getTargetVoltageForPos(int pos) {
+    // assert pos >= 0 && pos < voltage_chart.length : "pos out of range: " + pos;
+    if (pos < 0 || pos >= Constants. voltage_chart.length) {
+      throw new IllegalArgumentException("pos out of range: " + pos);
+    }
+    return Constants.voltage_chart[pos];
+  }
+
+  /**
+   * Returns the target flywheel RPM for a preset index.
+   *
+   * Intent:
+   * - Single source of truth for RPM lookup by preset.
+   * - Used by feeder gating and future closed-loop RPM control.
+   */
+  public double getTargetRpmForPos(int pos) {
+    // assert pos >= 0 && pos < rpm_chart.length : "pos out of range: " + pos;
+    if (pos < 0 || pos >= Constants.rpm_chart.length) {
+      throw new IllegalArgumentException("pos out of range: " + pos);
+    }
+    return Constants.rpm_chart[pos];
+  }
+
+  /**
+   * Finds the nearest preset index for a given distance.
+   *
+   * Intent:
+   * - Vision provides distance; we convert to the closest preset index.
+   * - Keeps preset index as the central "selector" for voltage/RPM tables.
+   */
+  public int getPosForDistance(double distanceMeters) {
+    int bestIndex = 0;
+    double bestError = Double.POSITIVE_INFINITY;
+    for (int i = 0; i < Constants.distance_chart_meters.length; i++) {
+      double error = Math.abs(Constants.distance_chart_meters[i] - distanceMeters);
+      if (error < bestError) {
+        bestError = error;
+        bestIndex = i;
+      }
+    }
+    return bestIndex;
+  }
+
+  /**
+   * Returns flywheel voltage from a distance measurement.
+   *
+   * Behavior:
+   * - NEAREST: convert distance -> nearest preset index -> voltage.
+   * - INTERPOLATED: linearly interpolate between table entries.
+   */
+  public double getTargetVoltageForDistance(double distanceMeters, LookupMode mode) {
+    if (mode == LookupMode.INTERPOLATED) {
+      return interpolateForDistance(distanceMeters, Constants.voltage_chart);
+    }
+    return getTargetVoltageForPos(getPosForDistance(distanceMeters));
+  }
+
+  /**
+   * Returns target RPM from a distance measurement.
+   *
+   * Behavior:
+   * - NEAREST: convert distance -> nearest preset index -> RPM.
+   * - INTERPOLATED: linearly interpolate between table entries.
+   */
+  public double getTargetRpmForDistance(double distanceMeters, LookupMode mode) {
+    if (mode == LookupMode.INTERPOLATED) {
+      return interpolateForDistance(distanceMeters, Constants.rpm_chart);
+    }
+    return getTargetRpmForPos(getPosForDistance(distanceMeters));
+  }
+
+  /**
+   * Linear interpolation helper for distance-based tables.
+   *
+   * Preconditions:
+   * - distance_chart and values must be same length.
+   * - distance_chart must be sorted ascending (in meters).
+   *
+   * Behavior:
+   * - Clamps to endpoints when distance is outside the table range.
+   * - Interpolates between the two bounding points otherwise.
+   */
+  private double interpolateForDistance(double distanceMeters, double[] values) {
+    // assert distance_chart.length == values.length : "chart length mismatch";
+    if (Constants.distance_chart_meters.length != values.length) {
+      throw new IllegalArgumentException("chart length mismatch");
+    }
+    if (Constants.distance_chart_meters.length == 0) {
+      return 0.0;
+    }
+    if (Constants.distance_chart_meters.length == 1) {
+      return values[0];
+    }
+    if (distanceMeters <= Constants.distance_chart_meters[0]) {
+      return values[0];
+    }
+    int lastIndex = Constants.distance_chart_meters.length - 1;
+    if (distanceMeters >= Constants.distance_chart_meters[lastIndex]) {
+      return values[lastIndex];
+    }
+    int lowerIndex = 0;
+    for (int i = 0; i < lastIndex; i++) {
+      if (distanceMeters <= Constants.distance_chart_meters[i + 1]) {
+        lowerIndex = i;
+        break;
+      }
+    }
+    double lowerDistance = Constants.distance_chart_meters[lowerIndex];
+    double upperDistance = Constants.distance_chart_meters[lowerIndex + 1];
+    double lowerValue = values[lowerIndex];
+    double upperValue = values[lowerIndex + 1];
+    double distanceSpan = upperDistance - lowerDistance;
+    if (distanceSpan <= 0.0) {
+      return lowerValue;
+    }
+    double interpolationRatio = (distanceMeters - lowerDistance) / distanceSpan;
+    return lowerValue + (upperValue - lowerValue) * interpolationRatio;
+  }
+
   private void handleSysIdLog(SysIdRoutineLog pLogData) {
 
   }
@@ -151,15 +294,50 @@ public class ShooterSubsystem extends SubsystemBase {
     return mSysId.dynamic(direction);
   }
 
-  public void runFeeder(int pos){
-    //System.out.println("Third Thingy");
-    //System.out.println((Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 150));
+  /**
+   * Runs the feeder motor when the flywheel is up to speed (RPMs)
+   *
+   * Intent:
+   * - Prevent feeding until the flywheel is at speed.
+   * - Allow a looser tolerance for the farthest shot index.
+   * - Rate-limit debug output to avoid console spam.
+   *
+   * Params:
+   * - pos: index into rpm_chart[] that selects the target RPM.
+   */
+  public void runFeeder(int pos) {
+    // assert pos >= 0 && pos < rpm_chart.length : "pos out of range: " + pos;
+    if (pos < 0 || pos >= Constants.rpm_chart.length) {
+      throw new IllegalArgumentException("pos out of range: " + pos);
+    }
 
-    
-    if (Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 25){
-      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
-    } else if ((pos == 3) && (Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 100)){
-      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    // Read the current flywheel RPM from the leader motor’s encoder.
+    double currentRpm =
+        mLeaderShooterMotor.getEncoder().getVelocity();
+
+    // Look up the target RPM for this position.
+    double targetRpm = getTargetRpmForPos(pos);
+
+    // Compute signed error: positive means below target, negative above.
+    double error = targetRpm - currentRpm;
+
+    // Use a looser tolerance for the farthest shot index.
+    double tolerance =
+        (pos == Constants.kFarShotIndex)
+            ? Constants.kFeederToleranceRpmFar
+            : Constants.kFeederToleranceRpm;
+            // Rate-limit debug output to avoid flooding the console.
+    double now = Timer.getFPGATimestamp();
+    if (now - lastFeederLogTimestamp
+        >= Constants.kFeederLogPeriodSec) {
+      System.out.println("Shooter RPM error: " + error);
+      lastFeederLogTimestamp = now;
+    }
+
+    // Only run the feeder once within tolerance.
+    if (Math.abs(error) <= tolerance) {
+      setFeederMotorVoltage(
+          Constants.ShooterSubsystemConstants.FeederSpeed);
     } else {
       setFeederMotorVoltage(0);
     }

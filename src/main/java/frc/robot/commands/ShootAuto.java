@@ -11,12 +11,10 @@ import edu.wpi.first.wpilibj.Timer;
 public class ShootAuto extends Command {
 
   ShooterSubsystem mShooter;
-  IntakeSubsystem mIntake;
   double mSpeed;
   Timer initial;
   // Initialization
-  public ShootAuto(ShooterSubsystem pShooter, IntakeSubsystem pIntake) {
-    mIntake = pIntake;
+  public ShootAuto(ShooterSubsystem pShooter) {
     mShooter = pShooter;
     mSpeed = 7;
     addRequirements(mShooter);
@@ -47,14 +45,17 @@ public class ShootAuto extends Command {
 
   @Override
   public void execute() {
-    mShooter.setFlywheelMotorVoltage(mSpeed);
-    mShooter.runFeeder(Constants.pos);
+    mShooter.setFlywheelMotorVoltage(6);
+
+    if (initial.get() > 2.5){
+      mShooter.setFeederMotorVoltage(6);
+    }
+    //mShooter.runFeeder(Constants.kMidShotIndex);
   }
 
   // Stops both motors when the button is let go of
   @Override
   public void end(boolean interrupted) {
-    mIntake.setFuelIntakeMotorSetpoint(0);
     mShooter.setFeederMotorVoltage(0);
     mShooter.setFlywheelMotorVoltage(0);
   }

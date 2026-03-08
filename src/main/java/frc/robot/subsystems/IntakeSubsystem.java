@@ -1,6 +1,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -13,29 +14,19 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants;
 
+@SuppressWarnings("unused")
 public class IntakeSubsystem extends SubsystemBase {
   // Initialization
   private final SparkMax mFuelIntakeMotor = new SparkMax(Constants.FuelIntakeCanID, MotorType.kBrushless);
-  private final SparkFlex mPivotIntakeMotor = new SparkFlex(Constants.PivotIntakeCanID, MotorType.kBrushless);
-
 
   public IntakeSubsystem() {
-    SparkMaxConfig PivotIntakeConfig = new SparkMaxConfig();
-  PivotIntakeConfig.idleMode(IdleMode.kBrake);
-    mPivotIntakeMotor.configure(PivotIntakeConfig, ResetMode.kNoResetSafeParameters,
-        PersistMode.kNoPersistParameters);
+  //   SparkMaxConfig PivotIntakeConfig = new SparkMaxConfig();
+  // PivotIntakeConfig.idleMode(IdleMode.kBrake);
+  //   mPivotIntakeMotor.configure(PivotIntakeConfig, ResetMode.kNoResetSafeParameters,
+  //       PersistMode.kNoPersistParameters);
     // var intakeFollowerConfig = new SparkFlexConfig().follow(mPivotIntakeMotor, false);
     // mPivotIntakeMotorRight.configure(intakeFollowerConfig, ResetMode.kResetSafeParameters,
     // PersistMode.kNoPersistParameters);
-  }
-
-  public double getPivotMotorSetpoint() {
-    return mPivotIntakeMotor.get();
-  }
-
-  public void setPivotMotorSetpoint(double pValue) {
-    mPivotIntakeMotor.set(pValue);
-    // mPivotIntakeMotorRight.set(-pValue);
   }
 
   public double getFuelIntakeMotorSetpoint() {

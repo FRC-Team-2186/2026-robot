@@ -33,7 +33,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 @SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
 
-  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(13.5);
+  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(9);
 
   private final SwerveDrive mSwerveDrive;
 
@@ -64,6 +64,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Periodically push absolute offsets to the encoders
     mSwerveDrive.setModuleEncoderAutoSynchronize(true, 3);
+
+    mSwerveDrive.setMotorIdleMode(false);
   }
 
   /**

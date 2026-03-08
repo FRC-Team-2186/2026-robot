@@ -1,18 +1,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.PivotSubsystem;
 
 public class IntakePivot extends Command {
 
-  private IntakeSubsystem mIntakeSubsystem;
+  private PivotSubsystem mPivotSubsystem;
   private double mSpeed;
 
   // Initialization
-  public IntakePivot(IntakeSubsystem subsystem, double pivotintakespeedreverse) {
-    mIntakeSubsystem = subsystem;
+  public IntakePivot(PivotSubsystem pPivotSubsystem, double pivotintakespeedreverse) {
+    mPivotSubsystem = pPivotSubsystem;
     mSpeed = pivotintakespeedreverse;
-    addRequirements(mIntakeSubsystem);
+    addRequirements(mPivotSubsystem);
   }
 
   @Override
@@ -22,7 +22,7 @@ public class IntakePivot extends Command {
   // Starting the pivot motor to turn the motor
   @Override
   public void execute() {
-    mIntakeSubsystem.setPivotMotorSetpoint(mSpeed);
+    mPivotSubsystem.setPivotMotorSetpoint(mSpeed);
   }
 
   // If the command is finished, return true
@@ -34,6 +34,6 @@ public class IntakePivot extends Command {
   // When button is unpressed, stop the motor
   @Override
   public void end(boolean interupted) {
-    mIntakeSubsystem.setPivotMotorSetpoint(0);
+    mPivotSubsystem.setPivotMotorSetpoint(0);
   }
 }

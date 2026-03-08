@@ -9,12 +9,12 @@ import frc.robot.Constants;
 public class RunFlywheel extends Command {
 
   ShooterSubsystem mShooter;
-  double mSpeed;
+  int mPos;
 
   // Initialization
-  public RunFlywheel(ShooterSubsystem pShooter, double pSpeed) {
+  public RunFlywheel(ShooterSubsystem pShooter, int pPos) {
     mShooter = pShooter;
-    mSpeed = pSpeed;
+    mPos = pPos;
 
     addRequirements(mShooter);
   }
@@ -26,20 +26,8 @@ public class RunFlywheel extends Command {
   // Starts both motors at the given speed
   @Override
   public void execute() {
-    mShooter.setFlywheelMotorVoltage(mSpeed);
-    //System.out.println(mSpeed);
-    int pos = 0;
-    if (mSpeed == Constants.lowVoltage){
-      pos = 0;
-    } else if (mSpeed == Constants.mediumVoltage){
-      pos = 1;
-    } else if (mSpeed == Constants.highVoltage){
-      pos = 2;
-    } else if (mSpeed == Constants.highestVoltage){
-      pos = 3;
-    }
-    //System.out.println(pos);
-    mShooter.runFeeder(pos);
+    mShooter.setFlywheelMotorVoltage(Constants.voltage_chart[mPos]);
+    mShooter.runFeeder(mPos);
   }
 
   // Stops both motors when the button is let go of

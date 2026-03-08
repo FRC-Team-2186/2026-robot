@@ -60,6 +60,12 @@ public final class Constants {
 
   public static double[] rpm_chart = {lowRpm,mediumRpm,highRpm,highestRpm};
 
+  public static int BottomPivitSwitchDioChannel = 0;
+  public static int TopPivitSwitchDioChannel = 1;
+
+  public static int BottomClimbSwitchDioChannel = 2;
+  public static int TopClimbSwitchDioChannel = 3;
+
   //public double[] voltage_chart = {0,3,5,7};
   //public double[] voltage_chart = {0,3,7,12};
   public static final double lowVoltage = 5;
@@ -74,12 +80,24 @@ public final class Constants {
   //Feet
   public static double[] distance_chart_feet = {5.5,9.75,11.27,12.791};
 
+  //Meters
+  public static double[] distance_chart_meters = {1.6764, 2.9718, 3.435096, 3.8986968};
+
   public static final int ClimbMotorCanID = 60;
 
-  public static final double fuelIntakeSpeed = 0.5;
-  public static final double fuelIntakeSpeedReverse = -0.5;
-  public static final double PivotIntakeSpeed = .025;
-  public static final double PivotIntakeSpeedReverse = -.05;
+  public static final int kNearShotIndex = 0;
+  public static final int kMidShotIndex = 1;
+  public static final int kHighShotIndex = 2;
+  public static final int kFarShotIndex = 3;
+  
+  public static final double kFeederToleranceRpm = 50.0;
+  public static final double kFeederToleranceRpmFar = 100.0;
+  public static final double kFeederLogPeriodSec = 0.25;
+
+  public static final double fuelIntakeSpeed = 0.4;
+  public static final double fuelIntakeSpeedReverse = -0.4;
+  public static final double PivotIntakeSpeed = .05;
+  public static final double PivotIntakeSpeedReverse = -.075;
 
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 0;

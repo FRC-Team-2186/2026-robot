@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import java.util.Optional;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -59,6 +60,12 @@ public class Robot extends LoggedRobot {
    * <p>
    * This runs after the mode specific periodic functions, but before LiveWindow and SmartDashboard integrated updating.
    */
+
+  @Override
+  public void robotInit(){
+
+    CameraServer.startAutomaticCapture();
+  }
 
   @Override
   public void robotPeriodic() {
