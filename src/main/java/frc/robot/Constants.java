@@ -25,7 +25,7 @@ import edu.wpi.first.units.measure.Velocity;
  */
 @SuppressWarnings("unused")
 public final class Constants {
-  public static final LinearVelocity DRIVE_MAX_SPEED = FeetPerSecond.of(12);
+  public static final double DRIVE_MAX_SPEED = 3.66;
 
   /*
    * Test CAN ID's public static final int FuelIntakeCanID = 10; public static final int PivotIntakeCanID = 22;
