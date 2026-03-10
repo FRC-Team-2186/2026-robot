@@ -22,7 +22,7 @@ public class IntakeFuel extends Command {
   // Starting the motor to run the intake motor
   @Override
   public void execute() {
-    mIntakeSubsystem.setPivotMotorSetpoint(mSpeed);
+    mIntakeSubsystem.setFuelIntakeMotorSetpoint(mSpeed);
   }
 
   // If the method is finished, return false
@@ -31,10 +31,10 @@ public class IntakeFuel extends Command {
     return false;
   }
 
-  // When button hold is over, turn off the motor
+  // When button hobuild is over, turn off the motor
   @Override
   public void end(boolean interupted) {
-    System.out.println("end");
-    mIntakeSubsystem.setPivotMotorSetpoint(0);
+    //System.out.println("end");
+    mIntakeSubsystem.setFuelIntakeMotorSetpoint(0);
   }
 }

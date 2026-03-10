@@ -9,12 +9,12 @@ import frc.robot.Constants;
 public class RunFlywheel extends Command {
 
   ShooterSubsystem mShooter;
-  double mSpeed;
+  int mPos;
 
   // Initialization
-  public RunFlywheel(ShooterSubsystem pShooter, double pSpeed) {
+  public RunFlywheel(ShooterSubsystem pShooter, int pPos) {
     mShooter = pShooter;
-    mSpeed = pSpeed;
+    mPos = pPos;
 
     addRequirements(mShooter);
   }
@@ -26,12 +26,14 @@ public class RunFlywheel extends Command {
   // Starts both motors at the given speed
   @Override
   public void execute() {
-    mShooter.setFlywheelMotorVoltage(mSpeed);
+    mShooter.setFlywheelMotorVoltage(Constants.voltage_chart[mPos]);
+    mShooter.runFeeder(mPos);
   }
 
   // Stops both motors when the button is let go of
   @Override
   public void end(boolean interrupted) {
+    mShooter.setFeederMotorVoltage(0);
     mShooter.setFlywheelMotorVoltage(0);
   }
 }

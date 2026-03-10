@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 public class MoveDown extends Command {
   ClimbSubsystem mClimbSubsystem;
-  DoubleSupplier mSpeedProvider;
+  double mSpeedProvider;
 
   // Initialization
-  public MoveDown(ClimbSubsystem pClimbSubsystem, DoubleSupplier pSpeedProvider) {
+  public MoveDown(ClimbSubsystem pClimbSubsystem, double pSpeedProvider) {
     mClimbSubsystem = pClimbSubsystem;
     mSpeedProvider = pSpeedProvider;
     addRequirements(mClimbSubsystem);
@@ -22,7 +22,7 @@ public class MoveDown extends Command {
   // Turning on the motor to lower the hook
   @Override
   public void execute() {
-    mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider.getAsDouble());
+    mClimbSubsystem.setClimbMotorSetPoint(mSpeedProvider);
   }
 
   // Sets the voltage to 0 when the code is finished running

@@ -12,6 +12,7 @@ import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
+import com.pathplanner.lib.auto.AutoBuilder;
 import static edu.wpi.first.units.Units.Radians;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,7 +33,7 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 @SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
 
-  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(13.5);
+  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(9);
 
   private final SwerveDrive mSwerveDrive;
 
@@ -63,6 +64,8 @@ public class SwerveSubsystem extends SubsystemBase {
 
     // Periodically push absolute offsets to the encoders
     mSwerveDrive.setModuleEncoderAutoSynchronize(true, 3);
+
+    mSwerveDrive.setMotorIdleMode(false);
   }
 
   /**
@@ -174,6 +177,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
       mSwerveDrive.drive(scaled, rotation, true, false);
     });
+  }
+
+  public void driveRobotOriented(ChassisSpeeds velocity){
+    mSwerveDrive.drive(velocity);
   }
 
   public Command driveFieldOrientedCommand(Supplier<ChassisSpeeds> pSpeedsSupplier) {
