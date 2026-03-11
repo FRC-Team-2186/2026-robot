@@ -3,8 +3,12 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 
+import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Rotations;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.PersistMode;
@@ -23,6 +27,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.GenericEntry;
 import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularAcceleration;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
@@ -84,11 +89,12 @@ public class ShooterSubsystem extends SubsystemBase {
       Constants.kHighVoltage };
 
   // Mutable holder for unit-safe voltage values, persisted to avoid reallocation.
-  private final MutVoltage m_appliedVoltage = Volts.mutable(0);
+  private final MutVoltage mAppliedVoltage = Volts.mutable(0);
   // Mutable holder for unit-safe linear distance values, persisted to avoid reallocation.
-  private final MutAngle m_angle = Radians.mutable(0);
+  private final MutAngle mPosition = Radians.mutable(0);
   // Mutable holder for unit-safe linear velocity values, persisted to avoid reallocation.
-  private final MutAngularVelocity m_velocity = RadiansPerSecond.mutable(0);
+  private final MutAngularVelocity mVelocity = RadiansPerSecond.mutable(0);
+  private final MutAngularAcceleration mAcceleration = RadiansPerSecondPerSecond.mutable(0);
 
   private final SysIdRoutine mSysId = new SysIdRoutine(new SysIdRoutine.Config(),
       new SysIdRoutine.Mechanism(mLeaderShooterMotor::setVoltage, this::handleSysIdLog, this));
@@ -133,7 +139,12 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   private void handleSysIdLog(SysIdRoutineLog pLogData) {
-
+    var appliedVoltage = Volts.of(mLeaderShooterMotor.getAppliedOutput() * mLeaderShooterMotor.getBusVoltage());
+    var current = Amps.of(mLeaderShooterMotor.getOutputCurrent());
+    var position = Rotations.of(mLeaderShooterMotor.getEncoder().getPosition());
+    var velocity = RotationsPerSecond.of(mLeaderShooterMotor.getEncoder().getVelocity());
+    pLogData.motor("Flywheel").voltage(mAppliedVoltage).current(Amps.of(mLeaderShooterMotor.getOutputCurrent()))
+        .angularPosition(mPosition).angularVelocity(mVelocity).angularAcceleration(mAcceleration);
   }
 
   /**
