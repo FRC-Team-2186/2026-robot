@@ -160,7 +160,7 @@ public class RobotContainer {
     m_chooser.addOption("DO NOT RUN ISTG (left Edition)", m_DoNotRunThisUnlesYouWantNoRobotAliveLeft);
     
     SmartDashboard.putData("Autonomous", m_chooser);
-
+/*
     // In RobotContainer.java constructor
     NamedCommands.registerCommand("dropPivot", new OpenPivot(mPivotSubsystem));
     NamedCommands.registerCommand("shootFuel", new ShootAuto(mShooterSubsystem));
@@ -222,7 +222,7 @@ public class RobotContainer {
     // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
     // mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kHighShotIndex));
     // mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kFarShotIndex));
-    mOperatorController.a().whileTrue(mShooterSubsystem.setFlywheelRpmCommand(RPM.of(2500)));
+    mOperatorController.a().whileTrue(mShooterSubsystem.setFlywheelRpmCommand(RPM.of(3250)));
 
     // mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.lowVoltage));
     // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.mediumVoltage));
