@@ -10,9 +10,12 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.FeetPerSecond;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.units.LinearVelocityUnit;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.units.measure.Voltage;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean constants. This
@@ -50,17 +53,17 @@ public final class Constants {
   public static final int FuelIntakeCanID = 24;
   public static final int PivotIntakeCanID = 22;
   public static final int PivotIntakeFollowerCanID = 11;
-  
+
   public static final int pos = 0;
 
-  //public double[] rpm_chart = {0,1649.75,2760.1,3910.5};
-  //public double[] rpm_chart = {0,1649.75,3910.5,6350.5};
+  // public double[] rpm_chart = {0,1649.75,2760.1,3910.5};
+  // public double[] rpm_chart = {0,1649.75,3910.5,6350.5};
   public static final double lowRpm = 2760.1;
   public static final double mediumRpm = 3331.5;
   public static final double highRpm = 4190.5;
   public static final double highestRpm = 4895.5;
 
-  public static double[] rpm_chart = {lowRpm,mediumRpm,highRpm,highestRpm};
+  public static double[] rpm_chart = { lowRpm, mediumRpm, highRpm, highestRpm };
 
   public static int BottomPivitSwitchDioChannel = 0;
   public static int TopPivitSwitchDioChannel = 1;
@@ -68,22 +71,22 @@ public final class Constants {
   public static int BottomClimbSwitchDioChannel = 2;
   public static int TopClimbSwitchDioChannel = 3;
 
-  //public double[] voltage_chart = {0,3,5,7};
-  //public double[] voltage_chart = {0,3,7,12};
+  // public double[] voltage_chart = {0,3,5,7};
+  // public double[] voltage_chart = {0,3,7,12};
   public static final double lowVoltage = 5;
   public static final double mediumVoltage = 6;
   public static final double highVoltage = 7.5;
   public static final double highestVoltage = 8.75;
-  public static double[] voltage_chart = {lowVoltage,mediumVoltage,highVoltage,highestVoltage};
-  
-  //Inches
-  public static double[] distance_chart_inches =  {66,117,135.24,153.5};
+  public static double[] voltage_chart = { lowVoltage, mediumVoltage, highVoltage, highestVoltage };
 
-  //Feet
-  public static double[] distance_chart_feet = {5.5,9.75,11.27,12.791};
+  // Inches
+  public static double[] distance_chart_inches = { 66, 117, 135.24, 153.5 };
 
-  //Meters
-  public static double[] distance_chart_meters = {1.6764, 2.9718, 3.435096, 3.8986968};
+  // Feet
+  public static double[] distance_chart_feet = { 5.5, 9.75, 11.27, 12.791 };
+
+  // Meters
+  public static double[] distance_chart_meters = { 1.6764, 2.9718, 3.435096, 3.8986968 };
 
   public static final int ClimbMotorCanID = 60;
 
@@ -91,7 +94,7 @@ public final class Constants {
   public static final int kMidShotIndex = 1;
   public static final int kHighShotIndex = 2;
   public static final int kFarShotIndex = 3;
-  
+
   public static final double kFeederToleranceRpm = 50.0;
   public static final double kFeederToleranceRpmFar = 100.0;
   public static final double kFeederLogPeriodSec = 0.25;
@@ -118,6 +121,11 @@ public final class Constants {
      * kFlywheelMotorCanId = 10; // SPARK Flex CAN ID (Right) public static final int kFlywheelFollowerMotorCanId = 25;
      * // SPARK Flex CAN ID (Left)
      */
+
+    public static final double kS = 0.041859;
+    public static final double kV = 0.1068;
+    public static final double kA = 0.024688;
+    public static final double kP = 0.14758;
 
     public static final class FeederSetpoints {
       public static final double kFeed = 0;
