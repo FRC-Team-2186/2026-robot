@@ -42,14 +42,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 @SuppressWarnings("unused")
 public class AgitatorSubsystem {
   
-  private final SparkMax mAgitatorMotor = new SparkMax(10, MotorType.kBrushless);
+  private final SparkMax mAgitatorMotor = new SparkMax(Constants.AgitatorMotorSpeed, MotorType.kBrushless);
 
   public double getAgitatorMotorSetpoint() {
     return mAgitatorMotor.get();
   }
 
   public void setAgitatorMotorSetpoint(double pValue) {
-    mAgitatorMotor.set(pValue);
+    mAgitatorMotor.set(-pValue);
   }
 
 }

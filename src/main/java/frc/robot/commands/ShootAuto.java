@@ -6,6 +6,7 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.Timer;
+import frc.robot.subsystems.AgitatorSubsystem;
 @SuppressWarnings("unused")
 
 public class ShootAuto extends Command {
@@ -13,10 +14,12 @@ public class ShootAuto extends Command {
   ShooterSubsystem mShooter;
   double mSpeed;
   Timer initial;
+  AgitatorSubsystem mAgitator;
   // Initialization
-  public ShootAuto(ShooterSubsystem pShooter) {
+  public ShootAuto(ShooterSubsystem pShooter, AgitatorSubsystem pAgitator) {
     mShooter = pShooter;
     mSpeed = 7;
+    mAgitator = pAgitator;
     addRequirements(mShooter);
   }
 
@@ -48,6 +51,7 @@ public class ShootAuto extends Command {
     mShooter.setFlywheelMotorVoltage(6);
 
     if (initial.get() > 2.5){
+      mAgitator.setAgitatorMotorSetpoint(.5);
       mShooter.setFeederMotorVoltage(6);
     }
     //mShooter.runFeeder(Constants.kMidShotIndex);

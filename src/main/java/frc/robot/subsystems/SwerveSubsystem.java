@@ -54,7 +54,7 @@ public class SwerveSubsystem extends SubsystemBase {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     try {
-      mSwerveDrive = new SwerveParser(pConfigDir).createSwerveDrive(Constants.DRIVE_MAX_SPEED.in(MetersPerSecond),
+      mSwerveDrive = new SwerveParser(pConfigDir).createSwerveDrive(Constants.DRIVE_MAX_SPEED,
           startingPose);
     } catch (Exception e) {
       throw new RuntimeException(e);
@@ -171,7 +171,7 @@ public class SwerveSubsystem extends SubsystemBase {
     var scaled = SwerveMath.cubeTranslation(new Translation2d(pTranslationX, pTranslationY));
 
     return getSwerveController().getTargetSpeeds(scaled.getX(), scaled.getY(), pRotateX, pRotateY,
-        getHeading().getRadians(), MAX_SPEED.in(MetersPerSecond));
+        getHeading().getRadians(),Constants.DRIVE_MAX_SPEED);
   }
 
   public Command driveRobotOrientedCommand(DoubleSupplier pTranslationX, DoubleSupplier pTranslationY,
