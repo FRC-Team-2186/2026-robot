@@ -14,6 +14,8 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
 import com.pathplanner.lib.auto.AutoBuilder;
 import static edu.wpi.first.units.Units.Radians;
+
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -32,6 +34,12 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 @SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
+
+  private final SlewRateLimiter xLimiter = new SlewRateLimiter(0.01);
+  
+  public void drive(double xSpeed, double rotSpeed){
+    double x = xLimiter.calculate(xSpeed);
+  }
 
   private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(9);
 

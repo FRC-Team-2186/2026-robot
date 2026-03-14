@@ -21,11 +21,19 @@ import java.io.File;
 import frc.robot.commands.rotateRobotAuto;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.config.PIDConstants;
 
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -39,6 +47,8 @@ import frc.robot.commands.MoveDown;
 import frc.robot.commands.ShooterVoltageTest;
 import frc.robot.commands.DriveTwoMetersForward;
 import frc.robot.commands.DriveAndIntake;
+import frc.robot.commands.MoveAgitator;
+import frc.robot.subsystems.AgitatorSubsystem;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a "declarative" paradigm, very
@@ -54,11 +64,17 @@ public class RobotContainer {
   private CommandXboxController mOperatorController = new CommandXboxController(
       OperatorConstants.kOperatorControllerPort);
 
+  // A chooser for autonomous commands
+  SendableChooser<Command> m_chooser = new SendableChooser<>();
+  //ShuffleboardTab autoTab = Shuffleboard.getTab("Auto Tab");
+
   private final ShooterSubsystem mShooterSubsystem = new ShooterSubsystem();
   private final SwerveSubsystem mSwerveDrive = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(), "swerve"));
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
   private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
   private final PivotSubsystem mPivotSubsystem = new PivotSubsystem();
+  private final AgitatorSubsystem mMoveAgitator = new AgitatorSubsystem();
+
     // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command m_drive2meters =
       new DriveTwoMetersBack(mSwerveDrive);
@@ -112,9 +128,6 @@ public class RobotContainer {
     .andThen(new DriveTwoMetersForward(mSwerveDrive))
     .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/2)))
     .andThen(new ShootAuto(mShooterSubsystem));
-  
-  // A chooser for autonomous commands
-  SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
       mSwerveDrive.getSwerveDrive(), //
@@ -129,21 +142,36 @@ public class RobotContainer {
       .robotRelative(true) //
       .allianceRelativeControl(false);
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer() {
     m_chooser.setDefaultOption("Drive 2 Meters Auto", m_drive2meters);
     m_chooser.addOption("Shoot Fuel Auto", m_shootFuel);
     m_chooser.addOption("Drive Auto then Shoot", m_driveThenShootFuel);
     m_chooser.addOption("Drive, Rotate Left, then Shoot", m_driveRotateLeftShoot);
     m_chooser.addOption("Drive, Rotate Right, then Shoot", m_driveRotateRightShoot);
-    //DONT USE v
+    /*DONT USE v
     m_chooser.addOption("Shoot then Drive Auto", m_shootFuelThenDrive);
     m_chooser.addOption("Lots of stuff Left (Dont run)", m_veryComplexMovementAutoLeft);
     m_chooser.addOption("Lots of stuff Right (Dont run)", m_veryComplexMovementAutoRight);
     m_chooser.addOption("DO NOT RUN ISTG (left Edition)", m_DoNotRunThisUnlesYouWantNoRobotAliveLeft);
+    
+    SmartDashboard.putData("Autonomous", m_chooser);
 
-    SmartDashboard.putData("Autonomus", m_chooser);
-    // Configure the trigger bindings
+    // In RobotContainer.java constructor
+    NamedCommands.registerCommand("dropPivot", new OpenPivot(mPivotSubsystem));
+    NamedCommands.registerCommand("shootFuel", new ShootAuto(mShooterSubsystem));
+    NamedCommands.registerCommand("inTakeFuel", new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
+
+    var autoChooser = AutoBuilder.buildAutoChooser();
+
+    autoChooser.addOption("Manual: Drive 2 Meters", m_drive2meters);
+    autoChooser.addOption("Manual: Shoot then Drive", m_shootFuelThenDrive);
+
+    autoTab.add("Select Auto", autoChooser)
+           .withWidget(BuiltInWidgets.kComboBoxChooser)
+           .withSize(2, 1)
+           .withPosition(0, 0);*/
+    
     configureBindings();
   }
 
@@ -173,8 +201,9 @@ public class RobotContainer {
     // Controlling the shooter
     mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kNearShotIndex));
     mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
-    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kHighShotIndex));
-    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kFarShotIndex));
+
+    mOperatorController.y().whileTrue(new MoveAgitator(mMoveAgitator));
+    mOperatorController.b().whileTrue(new FeederCommand(mShooterSubsystem));
 
 
     // mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.lowVoltage));
@@ -207,6 +236,7 @@ public class RobotContainer {
    */
 
   public Command getAutonomousCommand() {
+    //return autoChooser.getSelected();
     return m_chooser.getSelected();
   }
 
