@@ -34,6 +34,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -128,6 +129,9 @@ public class RobotContainer {
     .andThen(new DriveTwoMetersForward(mSwerveDrive))
     .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/2)))
     .andThen(new ShootAuto(mShooterSubsystem));
+  
+  // A chooser for autonomous commands
+  SendableChooser<Command> m_chooser = new SendableChooser<>();
 
   SwerveInputStream mDriveFieldOriented = SwerveInputStream.of( //
       mSwerveDrive.getSwerveDrive(), //
@@ -150,6 +154,7 @@ public class RobotContainer {
     m_chooser.addOption("Drive, Rotate Left, then Shoot", m_driveRotateLeftShoot);
     m_chooser.addOption("Drive, Rotate Right, then Shoot", m_driveRotateRightShoot);
     /*DONT USE v
+    //DONT USE v
     m_chooser.addOption("Shoot then Drive Auto", m_shootFuelThenDrive);
     m_chooser.addOption("Lots of stuff Left (Dont run)", m_veryComplexMovementAutoLeft);
     m_chooser.addOption("Lots of stuff Right (Dont run)", m_veryComplexMovementAutoRight);
@@ -172,6 +177,9 @@ public class RobotContainer {
            .withSize(2, 1)
            .withPosition(0, 0);*/
     
+
+    SmartDashboard.putData("Autonomus", m_chooser);
+    // Configure the trigger bindings
     configureBindings();
   }
 
@@ -204,6 +212,8 @@ public class RobotContainer {
 
     mOperatorController.y().whileTrue(new MoveAgitator(mMoveAgitator));
     mOperatorController.b().whileTrue(new FeederCommand(mShooterSubsystem));
+    // mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kHighShotIndex));
+    // mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kFarShotIndex));
 
 
     // mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.lowVoltage));
