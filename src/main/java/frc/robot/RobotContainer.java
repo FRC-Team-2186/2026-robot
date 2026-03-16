@@ -17,6 +17,9 @@ import swervelib.SwerveDrive;
 import frc.robot.commands.IntakeFuel;
 import frc.robot.commands.IntakePivot;
 import swervelib.SwerveInputStream;
+
+import static edu.wpi.first.units.Units.RPM;
+
 import java.io.File;
 import frc.robot.commands.rotateRobotAuto;
 
@@ -59,60 +62,50 @@ public class RobotContainer {
   private final IntakeSubsystem mIntakeSubsystem = new IntakeSubsystem();
   private final ClimbSubsystem mClimbSubsystem = new ClimbSubsystem();
   private final PivotSubsystem mPivotSubsystem = new PivotSubsystem();
-    // A simple auto routine that drives forward a specified distance, and then stops.
-  private final Command m_drive2meters =
-      new DriveTwoMetersBack(mSwerveDrive);
+  // A simple auto routine that drives forward a specified distance, and then stops.
+  private final Command m_drive2meters = new DriveTwoMetersBack(mSwerveDrive);
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_shootFuel = new OpenPivot(mPivotSubsystem).andThen(new ShootAuto(mShooterSubsystem));
-  private final Command m_rotateRobotLeft = new rotateRobotAuto(mSwerveDrive,90);
-  private final Command m_rotateRobotRight = new rotateRobotAuto(mSwerveDrive,-90);
+  private final Command m_rotateRobotLeft = new rotateRobotAuto(mSwerveDrive, 90);
+  private final Command m_rotateRobotRight = new rotateRobotAuto(mSwerveDrive, -90);
   private final Command m_DriveAndIntake = new DriveAndIntake(mSwerveDrive, mIntakeSubsystem);
 
-  private final Command m_shootFuelThenDrive = new OpenPivot(mPivotSubsystem).andThen(new ShootAuto(mShooterSubsystem)).andThen(new DriveTwoMetersBack(mSwerveDrive));
-  private final Command m_driveThenShootFuel = new OpenPivot(mPivotSubsystem).andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new ShootAuto(mShooterSubsystem));
-  private final Command m_driveRotateLeftShoot = new OpenPivot(mPivotSubsystem).andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/2))).andThen(new ShootAuto(mShooterSubsystem));
-  private final Command m_driveRotateRightShoot = new OpenPivot(mPivotSubsystem).andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/2))).andThen(new ShootAuto(mShooterSubsystem));
+  private final Command m_shootFuelThenDrive = new OpenPivot(mPivotSubsystem).andThen(new ShootAuto(mShooterSubsystem))
+      .andThen(new DriveTwoMetersBack(mSwerveDrive));
+  private final Command m_driveThenShootFuel = new OpenPivot(mPivotSubsystem)
+      .andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new ShootAuto(mShooterSubsystem));
+  private final Command m_driveRotateLeftShoot = new OpenPivot(mPivotSubsystem)
+      .andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 2)))
+      .andThen(new ShootAuto(mShooterSubsystem));
+  private final Command m_driveRotateRightShoot = new OpenPivot(mPivotSubsystem)
+      .andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 2)))
+      .andThen(new ShootAuto(mShooterSubsystem));
 
   private final Command m_veryComplexMovementAutoLeft = new DriveTwoMetersBack(mSwerveDrive)
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/2)))
-    .andThen(new OpenPivot(mPivotSubsystem))
-    .andThen(new ShootAuto(mShooterSubsystem))
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/2)))
-    .andThen(new DriveTwoMetersBack(mSwerveDrive))
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/3)))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI)))
-    .andThen(new DriveTwoMetersForward(mSwerveDrive));
+      .andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 2))).andThen(new OpenPivot(mPivotSubsystem))
+      .andThen(new ShootAuto(mShooterSubsystem)).andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 2)))
+      .andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 3)))
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI))).andThen(new DriveTwoMetersForward(mSwerveDrive));
 
   private final Command m_veryComplexMovementAutoRight = new DriveTwoMetersBack(mSwerveDrive)
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/2)))
-    .andThen(new OpenPivot(mPivotSubsystem))
-    .andThen(new ShootAuto(mShooterSubsystem))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/2)))
-    .andThen(new DriveTwoMetersBack(mSwerveDrive))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/3)))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI)))
-    .andThen(new DriveTwoMetersForward(mSwerveDrive));
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 2))).andThen(new OpenPivot(mPivotSubsystem))
+      .andThen(new ShootAuto(mShooterSubsystem)).andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 2)))
+      .andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 3)))
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI))).andThen(new DriveTwoMetersForward(mSwerveDrive));
 
   private final Command m_DoNotRunThisUnlesYouWantNoRobotAliveLeft = new DriveTwoMetersBack(mSwerveDrive)
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/2)))
-    .andThen(new OpenPivot(mPivotSubsystem))
-    .andThen(new ShootAuto(mShooterSubsystem))
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/2)))
-    .andThen(new DriveTwoMetersBack(mSwerveDrive))
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/3)))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI)))
-    .andThen(new DriveTwoMetersForward(mSwerveDrive))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/3)))
-    .andThen(new DriveAndIntake(mSwerveDrive, mIntakeSubsystem))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI)))
-    .andThen(new DriveAndIntake(mSwerveDrive, mIntakeSubsystem))
-    .andThen(new rotateRobotAuto(mSwerveDrive,-(Math.PI/3)))
-    .andThen(new DriveAndIntake(mSwerveDrive, mIntakeSubsystem))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/3)))
-    .andThen(new DriveTwoMetersForward(mSwerveDrive))
-    .andThen(new rotateRobotAuto(mSwerveDrive,(Math.PI/2)))
-    .andThen(new ShootAuto(mShooterSubsystem));
-  
+      .andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 2))).andThen(new OpenPivot(mPivotSubsystem))
+      .andThen(new ShootAuto(mShooterSubsystem)).andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 2)))
+      .andThen(new DriveTwoMetersBack(mSwerveDrive)).andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 3)))
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI))).andThen(new DriveTwoMetersForward(mSwerveDrive))
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 3)))
+      .andThen(new DriveAndIntake(mSwerveDrive, mIntakeSubsystem)).andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI)))
+      .andThen(new DriveAndIntake(mSwerveDrive, mIntakeSubsystem))
+      .andThen(new rotateRobotAuto(mSwerveDrive, -(Math.PI / 3)))
+      .andThen(new DriveAndIntake(mSwerveDrive, mIntakeSubsystem))
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 3))).andThen(new DriveTwoMetersForward(mSwerveDrive))
+      .andThen(new rotateRobotAuto(mSwerveDrive, (Math.PI / 2))).andThen(new ShootAuto(mShooterSubsystem));
+
   // A chooser for autonomous commands
   SendableChooser<Command> m_chooser = new SendableChooser<>();
 
@@ -136,7 +129,7 @@ public class RobotContainer {
     m_chooser.addOption("Drive Auto then Shoot", m_driveThenShootFuel);
     m_chooser.addOption("Drive, Rotate Left, then Shoot", m_driveRotateLeftShoot);
     m_chooser.addOption("Drive, Rotate Right, then Shoot", m_driveRotateRightShoot);
-    //DONT USE v
+    // DONT USE v
     m_chooser.addOption("Shoot then Drive Auto", m_shootFuelThenDrive);
     m_chooser.addOption("Lots of stuff Left (Dont run)", m_veryComplexMovementAutoLeft);
     m_chooser.addOption("Lots of stuff Right (Dont run)", m_veryComplexMovementAutoRight);
@@ -156,7 +149,7 @@ public class RobotContainer {
    */
 
   private void configureBindings() {
-    
+
     // Moving the robot
     var defaultDriveCommand = mSwerveDrive.driveFieldOrientedCommand(mDriveFieldOriented);
 
@@ -165,17 +158,16 @@ public class RobotContainer {
     mDriverController.a().onTrue(mSwerveDrive.zeroGyroCommand());
 
     // Controlling the Feeder Motor
-    //mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
+    // mOperatorController.a().whileTrue(new FeederCommand(mShooterSubsystem));
 
-    //Driver and Operator E-Stop for testing
-    
-    
+    // Driver and Operator E-Stop for testing
+
     // Controlling the shooter
-    mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kNearShotIndex));
-    mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
-    mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kHighShotIndex));
-    mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kFarShotIndex));
-
+    // mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kNearShotIndex));
+    // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
+    // mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kHighShotIndex));
+    // mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kFarShotIndex));
+    mOperatorController.a().whileTrue(mShooterSubsystem.setFlywheelRpmCommand(RPM.of(2500)));
 
     // mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.lowVoltage));
     // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.mediumVoltage));
@@ -193,8 +185,8 @@ public class RobotContainer {
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
 
-    mOperatorController.povUp().whileTrue(new MoveUp(mClimbSubsystem,0.5)); 
-    mOperatorController.povDown().whileTrue(new MoveDown(mClimbSubsystem,-0.5)); 
+    mOperatorController.povUp().whileTrue(new MoveUp(mClimbSubsystem, 0.5));
+    mOperatorController.povDown().whileTrue(new MoveDown(mClimbSubsystem, -0.5));
     // Controlling the Pivot Point for Intake
     mOperatorController.leftBumper().whileTrue(new IntakePivot(mPivotSubsystem, Constants.PivotIntakeSpeedReverse));
     mOperatorController.rightBumper().whileTrue(new IntakePivot(mPivotSubsystem, Constants.PivotIntakeSpeed));

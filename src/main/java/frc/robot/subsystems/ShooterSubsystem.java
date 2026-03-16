@@ -3,8 +3,13 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.lang.Math;
+
+import org.littletonrobotics.junction.Logger;
+
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RotationsPerSecond;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.PersistMode;
@@ -21,8 +26,11 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutVoltage;
@@ -39,7 +47,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 @SuppressWarnings("unused")
 public class ShooterSubsystem extends SubsystemBase {
- 
+
   public enum SetPointMode {
     RPM, VOLTAGE
   }
@@ -55,6 +63,10 @@ public class ShooterSubsystem extends SubsystemBase {
       Constants.ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
   private final SparkFlex mFeederShooterMotor = new SparkFlex(Constants.ShooterSubsystemConstants.kFeederMotorCanId,
       MotorType.kBrushless);
+
+  private final PIDController mPidController = new PIDController(Constants.ShooterSubsystemConstants.kP, 0, 0);
+  private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Constants.ShooterSubsystemConstants.kS,
+      Constants.ShooterSubsystemConstants.kV, Constants.ShooterSubsystemConstants.kA);
 
   private final RelativeEncoder leaderEncoder = mLeaderShooterMotor.getEncoder();
   private final RelativeEncoder followerEncoder = mFollowerShooterMotor.getEncoder();
@@ -86,7 +98,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
   private final SysIdRoutine mSysId = new SysIdRoutine(new SysIdRoutine.Config(),
       new SysIdRoutine.Mechanism(mLeaderShooterMotor::setVoltage, this::handleSysIdLog, this));
-  
+
   // Setting the motors to their current settings and overwriting previous configs.
   public ShooterSubsystem() {
 
@@ -95,7 +107,7 @@ public class ShooterSubsystem extends SubsystemBase {
     followerRpmEntry = Shuffleboard.getTab("Shooter").add("Shooter Follower RPM", 0.0).withWidget(BuiltInWidgets.kGraph)
         .getEntry();
 
-    //System.out.println("Working Shooter");
+    // System.out.println("Working Shooter");
 
     SparkFlexConfig leaderShooterMotorconfig = new SparkFlexConfig();
     SparkFlexConfig followerShooterMotorconfig = new SparkFlexConfig();
@@ -116,7 +128,7 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getFlywheelMotorVoltage() {
-    return mLeaderShooterMotor.getBusVoltage();
+    return mLeaderShooterMotor.getBusVoltage() * mLeaderShooterMotor.getAppliedOutput();
   }
 
   public void setFlywheelMotorVoltage(double motorVoltage) {
@@ -124,22 +136,42 @@ public class ShooterSubsystem extends SubsystemBase {
   }
 
   public double getFeederMotorVoltage() {
-    return mFeederShooterMotor.getBusVoltage();
+    return mFeederShooterMotor.getBusVoltage() * mFeederShooterMotor.getAppliedOutput();
   }
 
   public void setFeederMotorVoltage(double feederSubsystemMotorVoltage) {
     mFeederShooterMotor.setVoltage(feederSubsystemMotorVoltage);
   }
 
-   /**
+  public AngularVelocity getFlywheelSpeed() {
+    return RPM.of(mLeaderShooterMotor.getEncoder().getVelocity());
+  }
+
+  public Command setFlywheelRpmCommand(AngularVelocity pDesiredVelocity) {
+    return run(() -> {
+      var desiredRps = pDesiredVelocity.in(RotationsPerSecond);
+      var currentRps = getFlywheelSpeed().in(RotationsPerSecond);
+
+      // The PID and Feedforward controllers both expect rotations per second
+      var pidResult = mPidController.calculate(currentRps, desiredRps);
+      var feedforward = mFeedforward.calculate(desiredRps);
+      var voltage = pidResult + feedforward;
+
+      Logger.recordOutput("Shooter/Desired Velocity", pDesiredVelocity);
+      Logger.recordOutput("Shooter/PID Result", pidResult);
+      Logger.recordOutput("Shooter/FeedForward Result", feedforward);
+      mLeaderShooterMotor.setVoltage(voltage);
+    }).finallyDo(() -> {
+      mLeaderShooterMotor.stopMotor();
+    });
+  }
+
+  /**
    * Returns the current vision-estimated distance to the target (meters).
    *
-   * Intent:
-   * - Placeholder for future vision integration.
-   * - ShootByDistance uses this distance to select a preset.
+   * Intent: - Placeholder for future vision integration. - ShootByDistance uses this distance to select a preset.
    *
-   * Contract:
-   * - Return Double.NaN when no valid target/distance is available.
+   * Contract: - Return Double.NaN when no valid target/distance is available.
    */
 
   public double getVisionDistanceMeters() {
@@ -149,13 +181,12 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Returns the flywheel voltage for a preset index.
    *
-   * Intent:
-   * - Single source of truth for voltage lookup by preset.
-   * - Keeps open-loop voltage control aligned with distance/RPM tables.
+   * Intent: - Single source of truth for voltage lookup by preset. - Keeps open-loop voltage control aligned with
+   * distance/RPM tables.
    */
   public double getTargetVoltageForPos(int pos) {
     // assert pos >= 0 && pos < voltage_chart.length : "pos out of range: " + pos;
-    if (pos < 0 || pos >= Constants. voltage_chart.length) {
+    if (pos < 0 || pos >= Constants.voltage_chart.length) {
       throw new IllegalArgumentException("pos out of range: " + pos);
     }
     return Constants.voltage_chart[pos];
@@ -164,9 +195,8 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Returns the target flywheel RPM for a preset index.
    *
-   * Intent:
-   * - Single source of truth for RPM lookup by preset.
-   * - Used by feeder gating and future closed-loop RPM control.
+   * Intent: - Single source of truth for RPM lookup by preset. - Used by feeder gating and future closed-loop RPM
+   * control.
    */
   public double getTargetRpmForPos(int pos) {
     // assert pos >= 0 && pos < rpm_chart.length : "pos out of range: " + pos;
@@ -179,9 +209,8 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Finds the nearest preset index for a given distance.
    *
-   * Intent:
-   * - Vision provides distance; we convert to the closest preset index.
-   * - Keeps preset index as the central "selector" for voltage/RPM tables.
+   * Intent: - Vision provides distance; we convert to the closest preset index. - Keeps preset index as the central
+   * "selector" for voltage/RPM tables.
    */
   public int getPosForDistance(double distanceMeters) {
     int bestIndex = 0;
@@ -199,9 +228,8 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Returns flywheel voltage from a distance measurement.
    *
-   * Behavior:
-   * - NEAREST: convert distance -> nearest preset index -> voltage.
-   * - INTERPOLATED: linearly interpolate between table entries.
+   * Behavior: - NEAREST: convert distance -> nearest preset index -> voltage. - INTERPOLATED: linearly interpolate
+   * between table entries.
    */
   public double getTargetVoltageForDistance(double distanceMeters, LookupMode mode) {
     if (mode == LookupMode.INTERPOLATED) {
@@ -213,9 +241,8 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Returns target RPM from a distance measurement.
    *
-   * Behavior:
-   * - NEAREST: convert distance -> nearest preset index -> RPM.
-   * - INTERPOLATED: linearly interpolate between table entries.
+   * Behavior: - NEAREST: convert distance -> nearest preset index -> RPM. - INTERPOLATED: linearly interpolate between
+   * table entries.
    */
   public double getTargetRpmForDistance(double distanceMeters, LookupMode mode) {
     if (mode == LookupMode.INTERPOLATED) {
@@ -227,13 +254,11 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Linear interpolation helper for distance-based tables.
    *
-   * Preconditions:
-   * - distance_chart and values must be same length.
-   * - distance_chart must be sorted ascending (in meters).
+   * Preconditions: - distance_chart and values must be same length. - distance_chart must be sorted ascending (in
+   * meters).
    *
-   * Behavior:
-   * - Clamps to endpoints when distance is outside the table range.
-   * - Interpolates between the two bounding points otherwise.
+   * Behavior: - Clamps to endpoints when distance is outside the table range. - Interpolates between the two bounding
+   * points otherwise.
    */
   private double interpolateForDistance(double distanceMeters, double[] values) {
     // assert distance_chart.length == values.length : "chart length mismatch";
@@ -297,13 +322,10 @@ public class ShooterSubsystem extends SubsystemBase {
   /**
    * Runs the feeder motor when the flywheel is up to speed (RPMs)
    *
-   * Intent:
-   * - Prevent feeding until the flywheel is at speed.
-   * - Allow a looser tolerance for the farthest shot index.
-   * - Rate-limit debug output to avoid console spam.
+   * Intent: - Prevent feeding until the flywheel is at speed. - Allow a looser tolerance for the farthest shot index. -
+   * Rate-limit debug output to avoid console spam.
    *
-   * Params:
-   * - pos: index into rpm_chart[] that selects the target RPM.
+   * Params: - pos: index into rpm_chart[] that selects the target RPM.
    */
   public void runFeeder(int pos) {
     // assert pos >= 0 && pos < rpm_chart.length : "pos out of range: " + pos;
@@ -312,8 +334,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     // Read the current flywheel RPM from the leader motor’s encoder.
-    double currentRpm =
-        mLeaderShooterMotor.getEncoder().getVelocity();
+    double currentRpm = mLeaderShooterMotor.getEncoder().getVelocity();
 
     // Look up the target RPM for this position.
     double targetRpm = getTargetRpmForPos(pos);
@@ -322,22 +343,18 @@ public class ShooterSubsystem extends SubsystemBase {
     double error = targetRpm - currentRpm;
 
     // Use a looser tolerance for the farthest shot index.
-    double tolerance =
-        (pos == Constants.kFarShotIndex)
-            ? Constants.kFeederToleranceRpmFar
-            : Constants.kFeederToleranceRpm;
-            // Rate-limit debug output to avoid flooding the console.
+    double tolerance = (pos == Constants.kFarShotIndex) ? Constants.kFeederToleranceRpmFar
+        : Constants.kFeederToleranceRpm;
+    // Rate-limit debug output to avoid flooding the console.
     double now = Timer.getFPGATimestamp();
-    if (now - lastFeederLogTimestamp
-        >= Constants.kFeederLogPeriodSec) {
+    if (now - lastFeederLogTimestamp >= Constants.kFeederLogPeriodSec) {
       System.out.println("Shooter RPM error: " + error);
       lastFeederLogTimestamp = now;
     }
 
     // Only run the feeder once within tolerance.
     if (Math.abs(error) <= tolerance) {
-      setFeederMotorVoltage(
-          Constants.ShooterSubsystemConstants.FeederSpeed);
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
     } else {
       setFeederMotorVoltage(0);
     }
@@ -348,10 +365,13 @@ public class ShooterSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // SmartDashboard.putNumber("Flywheel (Leader) Applied Voltage",
-    //     mLeaderShooterMotor.getAppliedOutput() * mLeaderShooterMotor.getBusVoltage());
+    // mLeaderShooterMotor.getAppliedOutput() * mLeaderShooterMotor.getBusVoltage());
     // SmartDashboard.putNumber("Flywheel (Follower)",
-    //     mFollowerShooterMotor.getAppliedOutput() * mFollowerShooterMotor.getBusVoltage());
+    // mFollowerShooterMotor.getAppliedOutput() * mFollowerShooterMotor.getBusVoltage());
     // SmartDashboard.putNumber("Flywheel RPM", mLeaderShooterMotor.getEncoder().getVelocity());
     // SmartDashboard.putNumber("Feeder", mFeederShooterMotor.getBusVoltage());
+
+    Logger.recordOutput("Shooter/Applied Voltage", getFlywheelMotorVoltage());
+    Logger.recordOutput("Shooter/Speed", getFlywheelSpeed());
   }
 }
