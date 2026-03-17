@@ -62,13 +62,14 @@ public class Robot extends LoggedRobot {
    */
 
   @Override
-  public void robotInit(){
+  public void robotInit() {
 
     CameraServer.startAutomaticCapture();
   }
 
   @Override
   public void robotPeriodic() {
+    m_robotContainer.getVision().periodic();
 
     // Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
@@ -101,7 +102,7 @@ public class Robot extends LoggedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
-    
+
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     // schedule the autonomous command (example)
@@ -152,6 +153,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     mSimArena.simulationPeriodic();
+    m_robotContainer.getVision().simulationPeriodic(m_robotContainer.getSwerveSubsystem().getPose());
   }
 
   private void commandInterrupted(Command pInterrupted, Optional<Command> pInterrupting) {

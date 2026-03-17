@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -14,11 +17,15 @@ import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
 import com.pathplanner.lib.auto.AutoBuilder;
 import static edu.wpi.first.units.Units.Radians;
+
+import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -84,6 +91,10 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Command zeroGyroWithAliianceCommand() {
     return runOnce(this::zeroGyroCommand);
+  }
+
+  public void updateOdometryFromVision(Pose2d pVisionMeasurement, double pTimestamp, Matrix<N3, N1> pStdDevs) {
+    mSwerveDrive.addVisionMeasurement(pVisionMeasurement, pTimestamp, pStdDevs);
   }
 
   /**
@@ -178,7 +189,7 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  public void driveRobotOriented(ChassisSpeeds velocity){
+  public void driveRobotOriented(ChassisSpeeds velocity) {
     mSwerveDrive.drive(velocity);
   }
 
@@ -190,5 +201,20 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveFieldOriented(ChassisSpeeds velocity) {
     mSwerveDrive.driveFieldOriented(velocity);
+  }
+
+  public void driveRobotOrientedDirect(double pTranslationX, double pTranslationY, double pRotation) {
+    var translation = new Translation2d(pTranslationX, pTranslationY)
+        .times(getSwerveDrive().getMaximumChassisVelocity());
+    var scaled = SwerveMath.scaleTranslation(translation, 0.8);
+
+    var rotation = pRotation * getSwerveDrive().getMaximumChassisAngularVelocity();
+
+    mSwerveDrive.drive(scaled, rotation, true, false);
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Estimated Pose", getPose());
   }
 }

@@ -64,6 +64,8 @@ public class RobotContainer {
   private final PivotSubsystem mPivotSubsystem = new PivotSubsystem();
   // A simple auto routine that drives forward a specified distance, and then stops.
   private final Command m_drive2meters = new DriveTwoMetersBack(mSwerveDrive);
+
+  private final Vision mVision = new Vision(mSwerveDrive::updateOdometryFromVision);
   // A complex auto routine that drives forward, drops a hatch, and then drives backward.
   private final Command m_shootFuel = new OpenPivot(mPivotSubsystem).andThen(new ShootAuto(mShooterSubsystem));
   private final Command m_rotateRobotLeft = new rotateRobotAuto(mSwerveDrive, 90);
@@ -206,4 +208,7 @@ public class RobotContainer {
     return mSwerveDrive;
   }
 
+  public Vision getVision() {
+    return mVision;
+  }
 }
