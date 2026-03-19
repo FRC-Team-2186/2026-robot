@@ -328,6 +328,9 @@ public class ShooterSubsystem extends SubsystemBase {
    * Params: - pos: index into rpm_chart[] that selects the target RPM.
    */
   public void runFeeder(int pos) {
+    
+    
+    /*
     // assert pos >= 0 && pos < rpm_chart.length : "pos out of range: " + pos;
     if (pos < 0 || pos >= Constants.rpm_chart.length) {
       throw new IllegalArgumentException("pos out of range: " + pos);
@@ -354,6 +357,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
     // Only run the feeder once within tolerance.
     if (Math.abs(error) <= tolerance) {
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    } else {
+      setFeederMotorVoltage(0);
+    }
+    */
+
+    if (Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 25){
+      setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
+    } else if ((pos == 3) && (Math.abs(Constants.rpm_chart[pos] - mLeaderShooterMotor.getEncoder().getVelocity()) <= 100)){
       setFeederMotorVoltage(Constants.ShooterSubsystemConstants.FeederSpeed);
     } else {
       setFeederMotorVoltage(0);

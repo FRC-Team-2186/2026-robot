@@ -13,6 +13,10 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Degrees;
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
+
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -36,8 +40,8 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 public class SwerveSubsystem extends SubsystemBase {
 
   private final SlewRateLimiter xLimiter = new SlewRateLimiter(0.01);
-  
-  public void drive(double xSpeed, double rotSpeed){
+
+  public void drive(double xSpeed, double rotSpeed) {
     double x = xLimiter.calculate(xSpeed);
   }
 
@@ -54,8 +58,7 @@ public class SwerveSubsystem extends SubsystemBase {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     try {
-      mSwerveDrive = new SwerveParser(pConfigDir).createSwerveDrive(Constants.DRIVE_MAX_SPEED,
-          startingPose);
+      mSwerveDrive = new SwerveParser(pConfigDir).createSwerveDrive(Constants.DRIVE_MAX_SPEED, startingPose);
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
@@ -74,6 +77,30 @@ public class SwerveSubsystem extends SubsystemBase {
     mSwerveDrive.setModuleEncoderAutoSynchronize(true, 3);
 
     mSwerveDrive.setMotorIdleMode(false);
+
+    RobotConfig ppConfig;
+    try {
+      ppConfig = RobotConfig.fromGUISettings();
+    } catch (Exception e) {
+      // We don't care about handling errors here. If something's wrong, just die.
+      throw new RuntimeException(e);
+    }
+
+    AutoBuilder.configure(this::getPose, this::resetOdometry, () -> mSwerveDrive.getRobotVelocity(),
+        (chassisSpeeds, feedForwards) -> {
+          mSwerveDrive.setChassisSpeeds(chassisSpeeds);
+        }, new PPHolonomicDriveController(new PIDConstants(0), new PIDConstants(0)), ppConfig, () -> {
+          // Boolean supplier that controls when the path will be mirrored for the red alliance
+          // This will flip the path being followed to the red side of the field.
+          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+
+          var alliance = DriverStation.getAlliance();
+          if (alliance.isPresent()) {
+            
+            return alliance.get() == DriverStation.Alliance.Red;
+          }
+          return false;
+        }, this);
   }
 
   /**
@@ -171,7 +198,7 @@ public class SwerveSubsystem extends SubsystemBase {
     var scaled = SwerveMath.cubeTranslation(new Translation2d(pTranslationX, pTranslationY));
 
     return getSwerveController().getTargetSpeeds(scaled.getX(), scaled.getY(), pRotateX, pRotateY,
-        getHeading().getRadians(),Constants.DRIVE_MAX_SPEED);
+        getHeading().getRadians(), Constants.DRIVE_MAX_SPEED);
   }
 
   public Command driveRobotOrientedCommand(DoubleSupplier pTranslationX, DoubleSupplier pTranslationY,
@@ -187,7 +214,7 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  public void driveRobotOriented(ChassisSpeeds velocity){
+  public void driveRobotOriented(ChassisSpeeds velocity) {
     mSwerveDrive.drive(velocity);
   }
 
@@ -200,4 +227,5 @@ public class SwerveSubsystem extends SubsystemBase {
   public void driveFieldOriented(ChassisSpeeds velocity) {
     mSwerveDrive.driveFieldOriented(velocity);
   }
+
 }

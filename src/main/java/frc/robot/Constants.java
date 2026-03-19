@@ -108,9 +108,9 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;
   }
-
+  
   public static final class ShooterSubsystemConstants {
-    public static final double FeederSpeed = 6;
+    public static final double FeederSpeed = 9;
 
     public static final int kFeederMotorCanId = 28; // SPARK Flex CAN ID
     public static final int kFlywheelMotorCanId = 27; // SPARK Flex CAN ID (Right)
