@@ -18,6 +18,8 @@ import frc.robot.commands.IntakeFuel;
 import frc.robot.commands.IntakePivot;
 import swervelib.SwerveInputStream;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.RPM;
 
 import java.io.File;
@@ -28,6 +30,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.PivotSubsystem;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -37,9 +40,13 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.commands.RunFlywheel;
+import frc.robot.commands.SetFlywheelRpmCommand;
 import frc.robot.commands.MoveUp;
 import frc.robot.commands.MoveDown;
 import frc.robot.commands.ShooterVoltageTest;
+import frc.robot.commands.TurnToAprilTagCommand;
+import frc.robot.commands.TurnToHeading;
+import frc.robot.commands.TurnToPointCommand;
 import frc.robot.commands.DriveTwoMetersForward;
 import frc.robot.commands.DriveAndIntake;
 
@@ -51,6 +58,7 @@ import frc.robot.commands.DriveAndIntake;
 @SuppressWarnings("unused")
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
+  private static final Translation2d BLUE_ALLIANCE_HUB = new Translation2d(Meters.of(4.632), Meters.of(4.030));
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
   private CommandXboxController mDriverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
@@ -169,7 +177,9 @@ public class RobotContainer {
     // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
     // mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kHighShotIndex));
     // mOperatorController.b().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kFarShotIndex));
-    mOperatorController.a().whileTrue(mShooterSubsystem.setFlywheelRpmCommand(RPM.of(2500)));
+    mOperatorController.a().whileTrue(new SetFlywheelRpmCommand(mShooterSubsystem, () -> RPM.of(2500)));
+    mOperatorController.rightTrigger(0.5)
+        .whileTrue(new FeederCommand(mShooterSubsystem).alongWith(mShooterSubsystem.runAgitatorCommand(() -> -0.675)));
 
     // mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.lowVoltage));
     // mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.mediumVoltage));
@@ -186,12 +196,17 @@ public class RobotContainer {
     // Controlling the Paddles for Intake
     mOperatorController.leftTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeedReverse));
     mOperatorController.rightTrigger().whileTrue(new IntakeFuel(mIntakeSubsystem, Constants.fuelIntakeSpeed));
+    mOperatorController.povRight().whileTrue(mShooterSubsystem.runAgitatorCommand(() -> -0.25));
 
     mOperatorController.povUp().whileTrue(new MoveUp(mClimbSubsystem, 0.5));
     mOperatorController.povDown().whileTrue(new MoveDown(mClimbSubsystem, -0.5));
     // Controlling the Pivot Point for Intake
     mOperatorController.leftBumper().whileTrue(new IntakePivot(mPivotSubsystem, Constants.PivotIntakeSpeedReverse));
     mOperatorController.rightBumper().whileTrue(new IntakePivot(mPivotSubsystem, Constants.PivotIntakeSpeed));
+
+    // mDriverController.rightBumper().whileTrue(new TurnToHeading(mSwerveDrive, Degrees.of(270)));
+    // mDriverController.rightBumper().whileTrue(new TurnToPointCommand(mSwerveDrive, BLUE_ALLIANCE_HUB));
+    mDriverController.rightBumper().whileTrue(new TurnToAprilTagCommand(mSwerveDrive, mVision, () -> 26));
   }
 
   /**

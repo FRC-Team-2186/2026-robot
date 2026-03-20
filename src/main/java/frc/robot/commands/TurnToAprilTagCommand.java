@@ -52,6 +52,6 @@ public class TurnToAprilTagCommand extends Command {
   }
 
   private double getP() {
-    return SmartDashboard.getNumber("TurnToAprilTag/kP", 0.001);
+    return SmartDashboard.getNumber("TurnToAprilTag/kP", 0.01);
   }
 }

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.lang.Math;
+import java.util.function.DoubleSupplier;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -20,6 +21,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
@@ -63,6 +65,7 @@ public class ShooterSubsystem extends SubsystemBase {
       Constants.ShooterSubsystemConstants.kFlywheelFollowerMotorCanId, MotorType.kBrushless);
   private final SparkFlex mFeederShooterMotor = new SparkFlex(Constants.ShooterSubsystemConstants.kFeederMotorCanId,
       MotorType.kBrushless);
+  private final SparkMax mAgitatorMotor = new SparkMax(59, MotorType.kBrushless);
 
   private final PIDController mPidController = new PIDController(Constants.ShooterSubsystemConstants.kP, 0, 0);
   private final SimpleMotorFeedforward mFeedforward = new SimpleMotorFeedforward(Constants.ShooterSubsystemConstants.kS,
@@ -147,6 +150,12 @@ public class ShooterSubsystem extends SubsystemBase {
     return RPM.of(mLeaderShooterMotor.getEncoder().getVelocity());
   }
 
+  public Command runAgitatorCommand(DoubleSupplier pSpeedProvider) {
+    return run(() -> {
+      mAgitatorMotor.set(pSpeedProvider.getAsDouble());
+    }).finallyDo(() -> mAgitatorMotor.set(0));
+  }
+
   public Command setFlywheelRpmCommand(AngularVelocity pDesiredVelocity) {
     return run(() -> {
       var desiredRps = pDesiredVelocity.in(RotationsPerSecond);
@@ -161,8 +170,13 @@ public class ShooterSubsystem extends SubsystemBase {
       Logger.recordOutput("Shooter/PID Result", pidResult);
       Logger.recordOutput("Shooter/FeedForward Result", feedforward);
       mLeaderShooterMotor.setVoltage(voltage);
+
+      mFeederShooterMotor.set(0.5);
+      mAgitatorMotor.set(-0.675);
     }).finallyDo(() -> {
       mLeaderShooterMotor.stopMotor();
+      mFeederShooterMotor.set(0);
+      mAgitatorMotor.set(0);
     });
   }
 

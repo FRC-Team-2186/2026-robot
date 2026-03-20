@@ -17,13 +17,13 @@ public class TurnToPointCommand extends Command {
   private final SwerveSubsystem mSwerveSubsystem;
   private final Translation2d mTargetPosition;
 
-  private final ProfiledPIDController mPidController = new ProfiledPIDController(0.01, 0, 0, TURN_CONSTRAINTS);
+  private final ProfiledPIDController mPidController = new ProfiledPIDController(0.675, 0, 0, TURN_CONSTRAINTS);
 
   public TurnToPointCommand(SwerveSubsystem pSwerveSubsystem, Translation2d pTargetPosition) {
     mSwerveSubsystem = pSwerveSubsystem;
     mTargetPosition = pTargetPosition;
 
-    mPidController.setTolerance(Math.toRadians(3));
+    mPidController.setTolerance(Math.toRadians(25));
     mPidController.enableContinuousInput(-Math.PI, Math.PI);
 
     addRequirements(pSwerveSubsystem);
@@ -39,6 +39,7 @@ public class TurnToPointCommand extends Command {
     var currentPose = mSwerveSubsystem.getPose();
     var delta = currentPose.getTranslation().minus(mTargetPosition);
     var yaw = Radians.of(Math.atan2(delta.getY(), delta.getX()));
+    mPidController.setGoal(yaw.in(Radians));
     var heading = mSwerveSubsystem.getHeading();
 
     var theta = mPidController.calculate(heading.getRadians(), yaw.in(Radians));
