@@ -3,6 +3,9 @@ package frc.robot.subsystems;
 import java.io.File;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.LinearVelocity;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
@@ -89,7 +92,7 @@ public class SwerveSubsystem extends SubsystemBase {
     AutoBuilder.configure(this::getPose, this::resetOdometry, () -> mSwerveDrive.getRobotVelocity(),
         (chassisSpeeds, feedForwards) -> {
           mSwerveDrive.setChassisSpeeds(chassisSpeeds);
-        }, new PPHolonomicDriveController(new PIDConstants(0), new PIDConstants(0)), ppConfig, () -> {
+        }, new PPHolonomicDriveController(new PIDConstants(1.6), new PIDConstants(0)), ppConfig, () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
@@ -226,6 +229,11 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public void driveFieldOriented(ChassisSpeeds velocity) {
     mSwerveDrive.driveFieldOriented(velocity);
+  }
+
+  @Override
+  public void periodic() {
+    Logger.recordOutput("Est Pose", getPose());
   }
 
 }

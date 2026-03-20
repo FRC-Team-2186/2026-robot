@@ -48,10 +48,22 @@ public class ShootAuto extends Command {
 
   @Override
   public void execute() {
-    mShooter.setFlywheelMotorVoltage(6);
+    //mShooter.setFlywheelMotorVoltage(6);
+
+    double val = initial.get();
+    double currentTime = Math.floor(val);
+
+    if ((val - currentTime) > .9){
+      //mShooter.setFeederMotorVoltage(0);
+      mShooter.setFlywheelMotorVoltage(6);
+    } else {
+      //mShooter.setFlywheelMotorVoltage(7);
+      mShooter.setFlywheelMotorVoltage(7);
+      //mShooter.runFeeder(mPos);
+    }
 
     if (initial.get() > 2.5){
-      mAgitator.setAgitatorMotorSetpoint(.5);
+      mAgitator.setAgitatorMotorSetpoint(.775);
       mShooter.setFeederMotorVoltage(6);
     }
     //mShooter.runFeeder(Constants.kMidShotIndex);

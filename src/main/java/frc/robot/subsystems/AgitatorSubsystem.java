@@ -40,7 +40,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 
 
 @SuppressWarnings("unused")
-public class AgitatorSubsystem {
+public class AgitatorSubsystem extends SubsystemBase {
   
   private final SparkMax mAgitatorMotor = new SparkMax(Constants.AgitatorMotorSpeed, MotorType.kBrushless);
 

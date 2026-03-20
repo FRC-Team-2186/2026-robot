@@ -161,8 +161,10 @@ public class ShooterSubsystem extends SubsystemBase {
       Logger.recordOutput("Shooter/PID Result", pidResult);
       Logger.recordOutput("Shooter/FeedForward Result", feedforward);
       mLeaderShooterMotor.setVoltage(voltage);
+      mFeederShooterMotor.set(0.5);
     }).finallyDo(() -> {
       mLeaderShooterMotor.stopMotor();
+      mFeederShooterMotor.stopMotor();
     });
   }
 

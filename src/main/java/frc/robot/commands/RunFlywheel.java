@@ -1,5 +1,7 @@
 package frc.robot.commands;
 
+import static edu.wpi.first.units.Units.RPM;
+
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -33,7 +35,7 @@ public class RunFlywheel extends Command {
   // Starts both motors at the given speed
   @Override
   public void execute() {
-    mAgitator.setAgitatorMotorSetpoint(.4);
+    mAgitator.setAgitatorMotorSetpoint(.775);
 
     double val = initial.get();
     double currentTime = Math.floor(val);
@@ -41,7 +43,10 @@ public class RunFlywheel extends Command {
     if ((val - currentTime) > .9){
       //mShooter.setFeederMotorVoltage(0);
       mShooter.setFlywheelMotorVoltage(Constants.voltage_chart[mPos] + 1);
+      //mShooter.setFlywheelMotorVoltage(Constants.voltage_chart[mPos]);
+      //mShooter.setFlywheelRpmCommand(RPM.of(3050));
     } else {
+      //mShooter.setFlywheelRpmCommand(RPM.of(2950));
       mShooter.setFlywheelMotorVoltage(Constants.voltage_chart[mPos]);
       //mShooter.runFeeder(mPos);
     }
