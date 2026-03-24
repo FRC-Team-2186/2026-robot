@@ -69,7 +69,7 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void robotPeriodic() {
-
+    m_robotContainer.getVision().periodic();
     // Runs the Scheduler. This is responsible for polling buttons, adding newly-scheduled
     // commands, running already-scheduled commands, removing finished or interrupted commands,
     // and running subsystem periodic() methods. This must be called from the robot's periodic
@@ -152,6 +152,7 @@ public class Robot extends LoggedRobot {
   @Override
   public void simulationPeriodic() {
     mSimArena.simulationPeriodic();
+    m_robotContainer.getVision().simulationPeriodic(m_robotContainer.getSwerveSubsystem().getPose());
   }
 
   private void commandInterrupted(Command pInterrupted, Optional<Command> pInterrupting) {

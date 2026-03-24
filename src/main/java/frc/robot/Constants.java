@@ -28,7 +28,7 @@ import edu.wpi.first.units.measure.Voltage;
  */
 @SuppressWarnings("unused")
 public final class Constants {
-  public static final double DRIVE_MAX_SPEED = 3.66;
+  public static final double DRIVE_MAX_SPEED = 4;
 
   public static final int AgitatorMotorSpeed = 59 ;
 
@@ -58,12 +58,13 @@ public final class Constants {
 
   // public double[] rpm_chart = {0,1649.75,2760.1,3910.5};
   // public double[] rpm_chart = {0,1649.75,3910.5,6350.5};
+  public static final double LaRpm = 1649.75;
   public static final double lowRpm = 2760.1;
   public static final double mediumRpm = 3331.5;
   public static final double highRpm = 4190.5;
   public static final double highestRpm = 4895.5;
 
-  public static double[] rpm_chart = { lowRpm, mediumRpm, highRpm, highestRpm };
+  public static double[] rpm_chart = { lowRpm, mediumRpm, highRpm, highestRpm , LaRpm};
 
   public static int BottomPivitSwitchDioChannel = 0;
   public static int TopPivitSwitchDioChannel = 1;
@@ -77,7 +78,8 @@ public final class Constants {
   public static final double mediumVoltage = 6;
   public static final double highVoltage = 7.5;
   public static final double highestVoltage = 8.75;
-  public static double[] voltage_chart = { lowVoltage, mediumVoltage, highVoltage, highestVoltage };
+  public static final double LaVoltage = 3;
+  public static double[] voltage_chart = { lowVoltage, mediumVoltage, highVoltage, highestVoltage , LaVoltage};
 
   // Inches
   public static double[] distance_chart_inches = { 66, 117, 135.24, 153.5 };
@@ -94,6 +96,7 @@ public final class Constants {
   public static final int kMidShotIndex = 1;
   public static final int kHighShotIndex = 2;
   public static final int kFarShotIndex = 3;
+  public static final int kLaVoltage = 4;
 
   public static final double kFeederToleranceRpm = 50.0;
   public static final double kFeederToleranceRpmFar = 100.0;

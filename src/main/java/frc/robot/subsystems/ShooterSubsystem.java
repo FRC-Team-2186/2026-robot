@@ -3,9 +3,9 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import java.lang.Math;
-
+import java.util.function.DoubleSupplier;
 import org.littletonrobotics.junction.Logger;
-
+import com.revrobotics.spark.SparkMax;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;

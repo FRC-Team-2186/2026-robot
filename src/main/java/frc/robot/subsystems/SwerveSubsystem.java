@@ -19,7 +19,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-
+import edu.wpi.first.math.Matrix;
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -38,6 +38,8 @@ import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveParser;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 
 @SuppressWarnings("unused")
 public class SwerveSubsystem extends SubsystemBase {
@@ -48,7 +50,7 @@ public class SwerveSubsystem extends SubsystemBase {
     double x = xLimiter.calculate(xSpeed);
   }
 
-  private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(9);
+//   private static final LinearVelocity MAX_SPEED = FeetPerSecond.of(9);
 
   private final SwerveDrive mSwerveDrive;
 
@@ -92,7 +94,7 @@ public class SwerveSubsystem extends SubsystemBase {
     AutoBuilder.configure(this::getPose, this::resetOdometry, () -> mSwerveDrive.getRobotVelocity(),
         (chassisSpeeds, feedForwards) -> {
           mSwerveDrive.setChassisSpeeds(chassisSpeeds);
-        }, new PPHolonomicDriveController(new PIDConstants(1.6), new PIDConstants(0)), ppConfig, () -> {
+        }, new PPHolonomicDriveController(new PIDConstants(4.8), new PIDConstants(0)), ppConfig, () -> {
           // Boolean supplier that controls when the path will be mirrored for the red alliance
           // This will flip the path being followed to the red side of the field.
           // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
@@ -119,6 +121,10 @@ public class SwerveSubsystem extends SubsystemBase {
     } else {
       zeroGyro();
     }
+  }
+
+  public void updateOdometryFromVision(Pose2d pVisionMeasurement, double pTimestamp, Matrix<N3, N1> pStdDevs) {
+    mSwerveDrive.addVisionMeasurement(pVisionMeasurement, pTimestamp, pStdDevs);
   }
 
   public Command zeroGyroWithAliianceCommand() {
@@ -227,8 +233,14 @@ public class SwerveSubsystem extends SubsystemBase {
     });
   }
 
-  public void driveFieldOriented(ChassisSpeeds velocity) {
-    mSwerveDrive.driveFieldOriented(velocity);
+  public void driveRobotOrientedDirect(double pTranslationX, double pTranslationY, double pRotation) {
+    var translation = new Translation2d(pTranslationX, pTranslationY)
+        .times(getSwerveDrive().getMaximumChassisVelocity());
+    var scaled = SwerveMath.scaleTranslation(translation, 0.8);
+
+    var rotation = pRotation * getSwerveDrive().getMaximumChassisAngularVelocity();
+
+    mSwerveDrive.drive(scaled, rotation, true, false);
   }
 
   @Override

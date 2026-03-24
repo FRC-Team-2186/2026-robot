@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "liftThingy"
+            "name": "m_pull"
           }
         },
         {
@@ -25,7 +25,7 @@
         {
           "type": "named",
           "data": {
-            "name": "pull"
+            "name": "m_push"
           }
         }
       ]

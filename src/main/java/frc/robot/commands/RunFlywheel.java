@@ -15,14 +15,14 @@ public class RunFlywheel extends Command {
 
   ShooterSubsystem mShooter;
   int mPos;
-  AgitatorSubsystem mAgitator;
+  //AgitatorSubsystem mAgitator;
   Timer initial;
 
   // Initialization
-  public RunFlywheel(ShooterSubsystem pShooter, int pPos, AgitatorSubsystem pAgitator) {
+  public RunFlywheel(ShooterSubsystem pShooter, int pPos) {
     mShooter = pShooter;
     mPos = pPos;
-    mAgitator = pAgitator;
+    //mAgitator = pAgitator;
     addRequirements(mShooter);
   }
 
@@ -35,7 +35,7 @@ public class RunFlywheel extends Command {
   // Starts both motors at the given speed
   @Override
   public void execute() {
-    mAgitator.setAgitatorMotorSetpoint(.775);
+    //mAgitator.setAgitatorMotorSetpoint(.775);
 
     double val = initial.get();
     double currentTime = Math.floor(val);
@@ -57,7 +57,7 @@ public class RunFlywheel extends Command {
   // Stops both motors when the button is let go of
   @Override
   public void end(boolean interrupted) {
-    mAgitator.setAgitatorMotorSetpoint(0);
+    //mAgitator.setAgitatorMotorSetpoint(0);
     mShooter.setFeederMotorVoltage(0);
     mShooter.setFlywheelMotorVoltage(0);
   }

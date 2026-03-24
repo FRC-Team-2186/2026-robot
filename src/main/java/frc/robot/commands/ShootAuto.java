@@ -14,12 +14,12 @@ public class ShootAuto extends Command {
   ShooterSubsystem mShooter;
   double mSpeed;
   Timer initial;
-  AgitatorSubsystem mAgitator;
+  //AgitatorSubsystem mAgitator;
   // Initialization
-  public ShootAuto(ShooterSubsystem pShooter, AgitatorSubsystem pAgitator) {
+  public ShootAuto(ShooterSubsystem pShooter) {
     mShooter = pShooter;
     mSpeed = 7;
-    mAgitator = pAgitator;
+    //mAgitator = pAgitator;
     addRequirements(mShooter);
   }
 
@@ -63,7 +63,7 @@ public class ShootAuto extends Command {
     }
 
     if (initial.get() > 2.5){
-      mAgitator.setAgitatorMotorSetpoint(.775);
+      //mAgitator.setAgitatorMotorSetpoint(.775);
       mShooter.setFeederMotorVoltage(6);
     }
     //mShooter.runFeeder(Constants.kMidShotIndex);

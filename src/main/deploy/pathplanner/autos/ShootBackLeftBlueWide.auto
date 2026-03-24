@@ -7,7 +7,7 @@
         {
           "type": "named",
           "data": {
-            "name": "dropPivot"
+            "name": "m_dropPivot"
           }
         },
         {
@@ -19,7 +19,7 @@
         {
           "type": "named",
           "data": {
-            "name": "shootFuel"
+            "name": "m_shootFuelOnly"
           }
         },
         {
@@ -41,7 +41,7 @@
               {
                 "type": "named",
                 "data": {
-                  "name": "inTakeFuel"
+                  "name": "m_intakeFuel"
                 }
               }
             ]
@@ -50,7 +50,7 @@
         {
           "type": "named",
           "data": {
-            "name": "shootFuel"
+            "name": "m_shootFuelOnly"
           }
         }
       ]
