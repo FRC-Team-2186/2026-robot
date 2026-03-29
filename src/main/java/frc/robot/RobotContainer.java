@@ -287,9 +287,11 @@ public class RobotContainer {
                                 () -> mMoveAgitator.setAgitatorMotorSetpoint(0), mMoveAgitator)));*/
 
         mOperatorController.a().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kNearShotIndex));
-        mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
+        //mOperatorController.x().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kMidShotIndex));
 
-        mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kLaVoltage));
+        //mOperatorController.y().whileTrue(new RunFlywheel(mShooterSubsystem, Constants.kLaVoltage));
+
+        mOperatorController.x().whileTrue(mShooterSubsystem.setFlywheelRpmCommand(RPM.of(3000)));
         mOperatorController.b().whileTrue(new FeederCommand(mShooterSubsystem));
 
         mDriverController.rightBumper().whileTrue(new TurnToAprilTagCommand(mSwerveDrive, mVision, () -> 26));
